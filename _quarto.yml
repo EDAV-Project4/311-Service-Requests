@@ -6,11 +6,11 @@ execute:
   echo: true
 
 book:
-  title: "YOUR PROJECT TITLE"
+  title: "NYC 311 Service Requests"
   author:
-    - AUTHOR1 (UNI1)
-    - AUTHOR2 (UNI2)
-  repo-url: https://github.com/YOUR_GITHUB_ACCOUNT/REPO_NAME
+    - VARUN AGARWAL (VA2515)
+    - YU ZHENG LIM (YL5451)
+  repo-url: https://github.com/EDAV-Project4/311-Service-Requests
   date: today
   page-footer:
     right: |
