@@ -4,7 +4,28 @@
     "href": "index.html",
     "title": "NYC 311 Service Requests",
     "section": "",
-    "text": "1 Introduction"
+    "text": "1 Introduction\nThe goal of this project to analyze the 311 service request dataset fetched from NYC OpenData and use various plots to visualize and identify trends to find answers to proposed questions."
+  },
+  {
+    "objectID": "index.html#what-are-311-service-requests",
+    "href": "index.html#what-are-311-service-requests",
+    "title": "NYC 311 Service Requests",
+    "section": "1.1 What are 311 Service Requests ?",
+    "text": "1.1 What are 311 Service Requests ?\n311 service requests refer to the non emergency requests raised by the residents for municipal services. These service requests cover a broad range of non-urgent issues and concerns within a community, and they are typically handled by local government agencies.\nSome of the non urgent issues covered under 311 Service Requests -\n\nNoise Complaints\nGraffiti Removal\nAbandoned Vehicles\nReporting stray animals, animal nuisances, or other non-emergency animal-related issues.\nStreet and sidewalk maintenance\n\nThe 311 Service Requests can be raised by dialing the 311 telephone number or any of the other channels like mobile app or online portal"
+  },
+  {
+    "objectID": "index.html#why-311-service-requests-are-important",
+    "href": "index.html#why-311-service-requests-are-important",
+    "title": "NYC 311 Service Requests",
+    "section": "1.2 Why 311 Service Requests are important?",
+    "text": "1.2 Why 311 Service Requests are important?\n311 service requests provide valuable insights into the challenges experienced by the city’s residents. Analyzing trends and patterns in these requests enables local governments to comprehend the prevalent issues within the community. These insights, in turn, become instrumental for urban planning, development strategies, and policy formulation aimed at enhancing community welfare.\nThrough this project, our goal is to pinpoint the most common issues faced by residents across various districts in New York City. This information is particularly invaluable for the student community as it offers a nuanced understanding of the quality of life and community welfare in different districts, aiding informed decisions when renting an apartment."
+  },
+  {
+    "objectID": "index.html#questions-we-are-interested-in-studying--",
+    "href": "index.html#questions-we-are-interested-in-studying--",
+    "title": "NYC 311 Service Requests",
+    "section": "1.3 Questions we are interested in studying -",
+    "text": "1.3 Questions we are interested in studying -\n\nWhich borough has the most complaints?\nWhat is the location type most complaints are associated with?\nThe different types of complaints\nTypes of complaints that get resolved fastest/slowest along with the mean resolution time to close a request.\nWhat are the trends in service requests over time?\nAre there emerging trends or new issues that require attention based on recent service request data?\nProportion of requests that were closed?\nNYC Dept that gets most issues?"
   },
   {
     "objectID": "data.html#description",
