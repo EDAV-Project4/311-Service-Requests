@@ -8,8 +8,8 @@ execute:
 book:
   title: "NYC 311 Service Requests"
   author:
-    - VARUN AGARWAL (VA2515)
-    - YU ZHENG LIM (YL5451)
+    - VARUN AGARWAL (va2515)
+    - YU ZHENG LIM (yl5451)
   repo-url: https://github.com/EDAV-Project4/311-Service-Requests
   date: today
   page-footer:
