@@ -1,6 +1,35 @@
 # Data
+For the project, the dataset that we have chosen is the [311 Service Requests from 2010 to Present](https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9) from the NYC OpenData website.
 
 ## Description
+
+Source of the data set - [NYC OpenData Website](https://opendata.cityofnewyork.us/overview/)
+
+Dataset link: [311 Service Requests from 2010 to Present](https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9)
+
+The dataset is owned by NYC OpenData and the data was provided by 311 and Department of Information Technology and Telecommunications (DoITT) with the frequency of update set to daily. It offers a comprehensive view of service requests, particularly in terms of location specificity. There are multiple columns in the dataset using which we can help us pinpoint the exact location of the raised request.
+
+As we have such a comprehensive dataset which gets updated daily, there are **34.1M rows with 41 columns** in it. It covers all the service requests from 2010 till the present date.
+
+**However we discovered the following issues with the dataset -**
+
+1.  Due to the large dataset size, downloading the dataset as csv becomes difficult (\>6GB in size).
+2.  Reading such a large dataset in memory also becomes an issue causing RStudio session to crash.
+3.  Multiple columns in the dataset were redundant as they would help us in answering the proposed questions
+4.  Another issue is mentioned on the NYC OpenData website - Due to pandemic call handling modifications, the 'Open Data Channel Type' values may not accurately indicate the channel the Service Request was submitted in for the period starting March 2020.
+5.  Many of the data visualization libraries like ..... fail for big datasets and raise errors. As a result, a subset of the dataset is necessary for visualization.
+
+As a result, instead of reading the entire dataset starting with rows from the year 2010 till the current date, we have used a subset of the data of appropriate size (starting from Sept 2023 till Nov 2023).
+
+**Plan for importing the dataset -**
+
+1.  Since the dataset size is big, we cannot directly download the data and then subset for usage. Instead NYC OpenData has a data exploration tool to filter records before exporting the dataset.
+2.  We used the tool to filter for records starting from Sept 2023 till the current date and also excluded the redundant columns.
+3.  The dataset was exported as a CSV file and then used for further analysis.
+
+The dimensions of the subset: **()**
+
+## Research Plan
 
 ## Missing value analysis
 
