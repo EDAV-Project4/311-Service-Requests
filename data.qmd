@@ -37,4 +37,4 @@ plot_intro(df)
 
 **Bar 3, 4: There are no columns that are completely empty. There are also no rows that are completely filled.**
 
-**Bar 5: ~12% of the entire dataset's cells are empty.**
+**Bar 5: 12% of the entire dataset's cells are empty.**
