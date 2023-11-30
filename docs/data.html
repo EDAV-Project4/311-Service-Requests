@@ -142,7 +142,8 @@ ul.task-list li input[type="checkbox"] {
    
   <ul>
   <li><a href="#description" id="toc-description" class="nav-link active" data-scroll-target="#description"><span class="header-section-number">2.1</span> Description</a></li>
-  <li><a href="#missing-value-analysis" id="toc-missing-value-analysis" class="nav-link" data-scroll-target="#missing-value-analysis"><span class="header-section-number">2.2</span> Missing value analysis</a></li>
+  <li><a href="#research-plan" id="toc-research-plan" class="nav-link" data-scroll-target="#research-plan"><span class="header-section-number">2.2</span> Research Plan</a></li>
+  <li><a href="#missing-value-analysis" id="toc-missing-value-analysis" class="nav-link" data-scroll-target="#missing-value-analysis"><span class="header-section-number">2.3</span> Missing value analysis</a></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/EDAV-Project4/311-Service-Requests/edit/main/data.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/EDAV-Project4/311-Service-Requests/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
@@ -166,11 +167,35 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
+<p>For the project, the dataset that we have chosen is the <a href="https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9">311 Service Requests from 2010 to Present</a> from the NYC OpenData website.</p>
 <section id="description" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="description"><span class="header-section-number">2.1</span> Description</h2>
+<p>Source of the data set - <a href="https://opendata.cityofnewyork.us/overview/">NYC OpenData Website</a></p>
+<p>Dataset link: <a href="https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9">311 Service Requests from 2010 to Present</a></p>
+<p>The dataset is owned by NYC OpenData and the data was provided by 311 and Department of Information Technology and Telecommunications (DoITT) with the frequency of update set to daily. It offers a comprehensive view of service requests, particularly in terms of location specificity. There are multiple columns in the dataset using which we can help us pinpoint the exact location of the raised request.</p>
+<p>As we have such a comprehensive dataset which gets updated daily, there are <strong>34.1M rows with 41 columns</strong> in it. It covers all the service requests from 2010 till the present date.</p>
+<p><strong>However we discovered the following issues with the dataset -</strong></p>
+<ol type="1">
+<li>Due to the large dataset size, downloading the dataset as csv becomes difficult (&gt;6GB in size).</li>
+<li>Reading such a large dataset in memory also becomes an issue causing RStudio session to crash.</li>
+<li>Multiple columns in the dataset were redundant as they would help us in answering the proposed questions</li>
+<li>Another issue is mentioned on the NYC OpenData website - Due to pandemic call handling modifications, the ‘Open Data Channel Type’ values may not accurately indicate the channel the Service Request was submitted in for the period starting March 2020.</li>
+<li>Many of the data visualization libraries like ….. fail for big datasets and raise errors. As a result, a subset of the dataset is necessary for visualization.</li>
+</ol>
+<p>As a result, instead of reading the entire dataset starting with rows from the year 2010 till the current date, we have used a subset of the data of appropriate size (starting from Sept 2023 till Nov 2023).</p>
+<p><strong>Plan for importing the dataset -</strong></p>
+<ol type="1">
+<li>Since the dataset size is big, we cannot directly download the data and then subset for usage. Instead NYC OpenData has a data exploration tool to filter records before exporting the dataset.</li>
+<li>We used the tool to filter for records starting from Sept 2023 till the current date and also excluded the redundant columns.</li>
+<li>The dataset was exported as a CSV file and then used for further analysis.</li>
+</ol>
+<p>The dimensions of the subset: <strong>()</strong></p>
 </section>
-<section id="missing-value-analysis" class="level2" data-number="2.2">
-<h2 data-number="2.2" class="anchored" data-anchor-id="missing-value-analysis"><span class="header-section-number">2.2</span> Missing value analysis</h2>
+<section id="research-plan" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="research-plan"><span class="header-section-number">2.2</span> Research Plan</h2>
+</section>
+<section id="missing-value-analysis" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="missing-value-analysis"><span class="header-section-number">2.3</span> Missing value analysis</h2>
 
 
 </section>

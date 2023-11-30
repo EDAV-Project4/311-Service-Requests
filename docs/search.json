@@ -25,20 +25,27 @@
     "href": "index.html#questions-we-are-interested-in-studying--",
     "title": "NYC 311 Service Requests",
     "section": "1.3 Questions we are interested in studying -",
-    "text": "1.3 Questions we are interested in studying -\n\nWhich borough has the most complaints?\nWhat is the location type most complaints are associated with?\nThe different types of complaints\nTypes of complaints that get resolved fastest/slowest along with the mean resolution time to close a request.\nWhat are the trends in service requests over time?\nAre there emerging trends or new issues that require attention based on recent service request data?\nProportion of requests that were closed?\nNYC Dept that gets most issues?"
+    "text": "1.3 Questions we are interested in studying -\n\nWhich borough has the most complaints?\nWhat is the location type most complaints are associated with?\nService Requests by borough and status\nThe different types of complaints\nTypes of complaints that get resolved fastest/slowest along with the mean resolution time to close a request.\nWhat are the trends in service requests over time?\nAre there emerging trends or new issues that require attention based on recent service request data?\nProportion of requests that were closed?\nNYC Dept that gets most issues?"
   },
   {
     "objectID": "data.html#description",
     "href": "data.html#description",
     "title": "2  Data",
     "section": "2.1 Description",
-    "text": "2.1 Description"
+    "text": "2.1 Description\nSource of the data set - NYC OpenData Website\nDataset link: 311 Service Requests from 2010 to Present\nThe dataset is owned by NYC OpenData and the data was provided by 311 and Department of Information Technology and Telecommunications (DoITT) with the frequency of update set to daily. It offers a comprehensive view of service requests, particularly in terms of location specificity. There are multiple columns in the dataset using which we can help us pinpoint the exact location of the raised request.\nAs we have such a comprehensive dataset which gets updated daily, there are 34.1M rows with 41 columns in it. It covers all the service requests from 2010 till the present date.\nHowever we discovered the following issues with the dataset -\n\nDue to the large dataset size, downloading the dataset as csv becomes difficult (&gt;6GB in size).\nReading such a large dataset in memory also becomes an issue causing RStudio session to crash.\nMultiple columns in the dataset were redundant as they would help us in answering the proposed questions\nAnother issue is mentioned on the NYC OpenData website - Due to pandemic call handling modifications, the ‘Open Data Channel Type’ values may not accurately indicate the channel the Service Request was submitted in for the period starting March 2020.\nMany of the data visualization libraries like ….. fail for big datasets and raise errors. As a result, a subset of the dataset is necessary for visualization.\n\nAs a result, instead of reading the entire dataset starting with rows from the year 2010 till the current date, we have used a subset of the data of appropriate size (starting from Sept 2023 till Nov 2023).\nPlan for importing the dataset -\n\nSince the dataset size is big, we cannot directly download the data and then subset for usage. Instead NYC OpenData has a data exploration tool to filter records before exporting the dataset.\nWe used the tool to filter for records starting from Sept 2023 till the current date and also excluded the redundant columns.\nThe dataset was exported as a CSV file and then used for further analysis.\n\nThe dimensions of the subset: ()"
+  },
+  {
+    "objectID": "data.html#research-plan",
+    "href": "data.html#research-plan",
+    "title": "2  Data",
+    "section": "2.2 Research Plan",
+    "text": "2.2 Research Plan"
   },
   {
     "objectID": "data.html#missing-value-analysis",
     "href": "data.html#missing-value-analysis",
     "title": "2  Data",
-    "section": "2.2 Missing value analysis",
-    "text": "2.2 Missing value analysis"
+    "section": "2.3 Missing value analysis",
+    "text": "2.3 Missing value analysis"
   }
 ]
