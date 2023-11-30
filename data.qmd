@@ -14,7 +14,7 @@ df <- read_csv('I:/My Drive/MSDS/Study/Fall23/EDAV/Homework/final_project/311_Se
 # plot % of missing values for columns 
 plot_missing(df, title = "% of missing values for Features (or columns)", geom_label_args = list("size" = 2))
 ```
-**We can see that the top few columns eg. Park Borough, Park Facility Name, till Created Date, comprise 0% missing values. That increases to 0.7%-3.7% from Address Type to Street Name. These are still in the Good range (<5%, per documentation). For City to Closed Dates, the number of missing values rises to 5%-12%, in the OK range (<5% to 40%). For Landmark, this increases to 40%, in the Bad range (>40% to 80% range). For Facility Type, Vehicle Type, Due Date, almost all rows (>93%) have missing values, in the Remove range (>80%).**
+**We can see that the top few columns eg. Park Borough, Park Facility Name, till Created Date, comprise 0% missing values. That increases to 0.7%-3.7% from Address Type to Street Name. These are still in the Good range (<5%, per documentation). For City to Closed Date, the number of missing values rises to 5%-12%, in the OK range (<5% to 40%). For Landmark, this increases to 40%, in the Bad range (>40% to 80% range). For Facility Type, Vehicle Type, Due Date, almost all rows (>93%) have missing values, which is so high that the package parks them under the Remove range (>80%).**
 
 **Documentation: https://rdrr.io/cran/DataExplorer/src/R/plot_missing.r**
 
@@ -22,12 +22,19 @@ plot_missing(df, title = "% of missing values for Features (or columns)", geom_l
 plot_intro(df)
 ```
 **Only the last 3 bars pertain to missing data values. These bars represent the following:**
+
 **Bar 1. Discrete Columns: % of columns with discrete data**
+
 **Bar 2. Continuous Columns: % of columns with continuous data**
+
 **Bar 3. All Missing Columns: % of columns with everything missing**
+
 **Bar 4. Complete Rows: % of rows with everything filled**
+
 **Bar 5. Missing Observations: % of empty cells across whole dataset**
+
 **Documentation: Pg11, from "introduce" function,  https://cran.r-project.org/web/packages/DataExplorer/DataExplorer.pdf **
 
 **Bar 3, 4: There are no columns that are completely empty. There are also no rows that are completely filled.**
-**Bar 5: 12% of the entire dataset are empty.**
+
+**Bar 5: 12% of the entire dataset is empty.**

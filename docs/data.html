@@ -227,7 +227,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="data_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p><strong>We can see that the top few columns eg. Park Borough, Park Facility Name, till Created Date, comprise 0% missing values. That increases to 0.7%-3.7% from Address Type to Street Name. These are still in the Good range (&lt;5%, per documentation). For City to Closed Dates, the number of missing values rises to 5%-12%, in the OK range (&lt;5% to 40%). For Landmark, this increases to 40%, in the Bad range (&gt;40% to 80% range). For Facility Type, Vehicle Type, Due Date, almost all rows (&gt;93%) have missing values, in the Remove range (&gt;80%).</strong></p>
+<p><strong>We can see that the top few columns eg. Park Borough, Park Facility Name, till Created Date, comprise 0% missing values. That increases to 0.7%-3.7% from Address Type to Street Name. These are still in the Good range (&lt;5%, per documentation). For City to Closed Date, the number of missing values rises to 5%-12%, in the OK range (&lt;5% to 40%). For Landmark, this increases to 40%, in the Bad range (&gt;40% to 80% range). For Facility Type, Vehicle Type, Due Date, almost all rows (&gt;93%) have missing values, which is so high that the package parks them under the Remove range (&gt;80%).</strong></p>
 <p><strong>Documentation: https://rdrr.io/cran/DataExplorer/src/R/plot_missing.r</strong></p>
 <div class="cell">
 <details>
@@ -238,8 +238,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="data_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p><strong>Only the last 3 bars pertain to missing data values. These bars represent the following:</strong> <strong>Bar 1. Discrete Columns: % of columns with discrete data</strong> <strong>Bar 2. Continuous Columns: % of columns with continuous data</strong> <strong>Bar 3. All Missing Columns: % of columns with everything missing</strong> <strong>Bar 4. Complete Rows: % of rows with everything filled</strong> <strong>Bar 5. Missing Observations: % of empty cells across whole dataset</strong> <strong>Documentation: Pg11, from “introduce” function, https://cran.r-project.org/web/packages/DataExplorer/DataExplorer.pdf </strong></p>
-<p><strong>Bar 3, 4: There are no columns that are completely empty. There are also no rows that are completely filled.</strong> <strong>Bar 5: 12% of the entire dataset are empty.</strong></p>
+<p><strong>Only the last 3 bars pertain to missing data values. These bars represent the following:</strong></p>
+<p><strong>Bar 1. Discrete Columns: % of columns with discrete data</strong></p>
+<p><strong>Bar 2. Continuous Columns: % of columns with continuous data</strong></p>
+<p><strong>Bar 3. All Missing Columns: % of columns with everything missing</strong></p>
+<p><strong>Bar 4. Complete Rows: % of rows with everything filled</strong></p>
+<p><strong>Bar 5. Missing Observations: % of empty cells across whole dataset</strong></p>
+<p><strong>Documentation: Pg11, from “introduce” function, https://cran.r-project.org/web/packages/DataExplorer/DataExplorer.pdf </strong></p>
+<p><strong>Bar 3, 4: There are no columns that are completely empty. There are also no rows that are completely filled.</strong></p>
+<p><strong>Bar 5: 12% of the entire dataset is empty.</strong></p>
 
 
 </section>
