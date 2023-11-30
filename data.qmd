@@ -31,6 +31,38 @@ The dimensions of the subset: **()**
 
 ## Research Plan
 
+As seen in Section 1.3, these are the questions and the proposed methods we plan to adopt, to answer them.
+
+1. Which borough has the most complaints, and the least?
+
+We will plot the Borough features (eg. Borough) with a bar chart, sorted in descending order, to see which boroughs have the most/least complaints over the given time period. As this Borough feature has no missing values, we can use it to plot, without needing any data imputation.
+
+2. Which complaint types are the most numerous, and the least?
+
+Similar to question 1, we can use a bar chart to do this exploration. We can use the feature "Complaint Type" for this visualisation.
+
+3. What are the locations that most complaints are associated with?
+
+We will make use of address features (eg. Borough, Street Name), and the Complaint Type feature, to plot multiple heatmaps (1 for each address feature). The higher the color intensity, the worse the area in terms of complaint count. Since Borough and Street Name features have very few missing values (0-3%), our plots would be a comprehensive representation of the dataset.
+
+4. Proportion of complaints that were closed by different departments? 
+
+We can plot the Agency feature, against the Complaint Type and the Status feature, using a mosaic plot, to see the types of complaints successfully closed/left unclosed by each agency. 
+
+5. Types of complaints that get closed the fastest/slowest, by using the mean resolution time to close a request.
+
+We can use the Created and Closed Dates features to create a new column "Closing Duration", aggregate the mean duration for each Complaint Type, and plot the mean Closing Duration against each Complaint Type. If necessary, we may use the median instead of the mean. We can plot this using a box/violin plot.
+
+But to do so, we first need to pre-process the date related features, and convert the strings into timestamps, so as to calculate the duration.
+
+We can also plot the mean Closing Duration, against the location features, using a chloropeth map, to see which locations close complaints the fastest/slowest.
+
+6. What are the trends in service requests over time?
+
+We can plot a time series line chart/ridgeline plot, using the Complaint Types (take the sum eg. for each Borough) plotted against time based features (Created Date, binned into weeks of the year). We could explore adding interactive filters to drill down into each location, to see the trend of different complaint types per location.
+
+For all the above questions, depending on the results that we observe, we may drill down to lower level features. For example, for certain Boroughs with high number of complaints, we can drill down to Street/Zipcode/Community District levels, to investigate the specific areas that contribute most to the issue.
+
 ## Missing value analysis
 
 ```{r message = FALSE}
