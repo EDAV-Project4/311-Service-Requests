@@ -1,1 +1,34 @@
 # Introduction
+
+The goal of this project to analyze the 311 service request dataset fetched from [NYC OpenData](https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9) and use various plots to visualize and identify trends to find answers to proposed questions.
+
+## What are 311 Service Requests ?
+
+311 service requests refer to the non emergency requests raised by the residents for municipal services. These service requests cover a broad range of non-urgent issues and concerns within a community, and they are typically handled by local government agencies.
+
+Some of the non urgent issues covered under 311 Service Requests -
+
+-   **Noise Complaints**
+-   **Graffiti Removal**
+-   **Abandoned Vehicles**
+-   **Reporting stray animals, animal nuisances, or other non-emergency animal-related issues.**
+-   **Street and sidewalk maintenance**
+
+The 311 Service Requests can be raised by dialing the 311 telephone number or any of the other channels like [mobile app](https://apps.apple.com/us/app/nyc-311/id324897619) or [online portal](https://portal.311.nyc.gov/)
+
+## Why 311 Service Requests are important?
+
+311 service requests provide valuable insights into the challenges experienced by the city's residents. Analyzing trends and patterns in these requests enables local governments to comprehend the prevalent issues within the community. These insights, in turn, become instrumental for urban planning, development strategies, and policy formulation aimed at enhancing community welfare.
+
+Through this project, our goal is to pinpoint the most common issues faced by residents across various districts in New York City. This information is particularly invaluable for the student community as it offers a nuanced understanding of the quality of life and community welfare in different districts, aiding informed decisions when renting an apartment.
+
+## Questions we are interested in studying -
+
+1.  Which borough has the most complaints?
+2.  What is the location type most complaints are associated with?
+3.  The different types of complaints
+4.  Types of complaints that get resolved fastest/slowest along with the mean resolution time to close a request.
+5.  What are the trends in service requests over time?
+6.  Are there emerging trends or new issues that require attention based on recent service request data?
+7.  Proportion of requests that were closed?
+8.  NYC Dept that gets most issues?
