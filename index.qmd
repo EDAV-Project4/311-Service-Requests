@@ -24,11 +24,9 @@ Through this project, our goal is to pinpoint the most common issues faced by re
 
 ## Questions we are interested in studying -
 
-1.  Which borough has the most complaints?
-2.  What is the location type most complaints are associated with?
-3.  The different types of complaints
-4.  Types of complaints that get resolved fastest/slowest along with the mean resolution time to close a request.
-5.  What are the trends in service requests over time?
-6.  Are there emerging trends or new issues that require attention based on recent service request data?
-7.  Proportion of requests that were closed?
-8.  NYC Dept that gets most issues?
+1.  Which borough has the most complaints, and the least??
+2.  Which complaint types are the most numerous, and the least?
+3.  What are the locations that most complaints are associated with?
+4.  What is the proportion of complaints that were closed by different departments?
+5.  What types of complaints get closed the fastest/slowest, by using the mean resolution time to close a request?
+6.  What are the trends in service requests over time?
