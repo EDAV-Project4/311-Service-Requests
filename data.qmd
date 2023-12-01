@@ -28,11 +28,11 @@ As a result, instead of reading the entire dataset starting with rows from the y
 2.  We used the tool to filter for records starting from Sept 2023 till the current date and also excluded the redundant columns.
 3.  The dataset was exported as a CSV file and then used for further analysis.
 
-The dimensions of the subset: **()**
+The dimensions of the subset: **837k rows by 32 columns, 350MB**
 
 ## Research Plan
 
-As seen in Section 1.3, these are the questions and the proposed methods we plan to adopt, to answer them.
+As seen in Section 1.3, these are the questions and the proposed methods we plan to adopt, to answer them. With these issues explored, it should give students an idea of which areas/streets are more problematic (more complaints; complaints of a non-trivial nature such as rat or noise issues; slow response speed by authorities to address them; ) and hence might be good to avoid.
 
 1.  Which borough has the most complaints, and the least?
 
@@ -66,12 +66,18 @@ For all the above questions, depending on the results that we observe, we may dr
 
 ## Missing value analysis
 
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
 ```{r message = FALSE}
 library(readr)
 library(DataExplorer)
+# library("googledrive")
 
 #load data
 df <- read_csv('I:/My Drive/MSDS/Study/Fall23/EDAV/Homework/final_project/311_Service_Requests_from_20230901_to_20231129.csv')
+# df <- drive_read_string("https://drive.google.com/file/d/1UsYevTBsztmkhGO45Fubz1ToqzoeNHcV/view?usp=drive_link", type = 'csv') #always needs authentication, may not be ideal
 
 # plot % of missing values for columns 
 plot_missing(df, title = "% of missing values for Features (or columns)", geom_label_args = list("size" = 2))
@@ -83,7 +89,7 @@ plot_missing(df, title = "% of missing values for Features (or columns)", geom_l
 2.  For City to Closed Date, the number of missing values rises to 5%-12%, in the OK range (\<5% to 40%). For Landmark, this increases to 40%, in the Bad range (\>40% to 80% range).
 3.  For Facility Type, Vehicle Type, Due Date, almost all rows (\>93%) have missing values, which is so high that the package parks them under the Remove range (\>80%).\*\*
 
-**Documentation: https://rdrr.io/cran/DataExplorer/src/R/plot_missing.r**
+**Documentation: ["link"](https://rdrr.io/cran/DataExplorer/src/R/plot_missing.r)**
 
 ```{r message = FALSE}
 plot_intro(df)
@@ -103,6 +109,8 @@ plot_intro(df)
 
 **Documentation: Pg11, from ["introduce"](https://cran.r-project.org/web/packages/DataExplorer/DataExplorer.pdf) function**
 
-**Bar 3, 4: There are no columns that are completely empty. There are also no rows that are completely filled.**
+**Bar 3: There are no columns that are completely empty. However, this doesn't mean that all columns are useful, as it still depends on the proportion of empty values for each column (seen in 1st visualisation above. Highly empty columns may not be as useful), and the relevance of the column to the questions we are answering.**
 
-**Bar 5: 12% of the entire dataset's cells are empty.**
+**Bar 4: There are also no rows that are completely filled. This might not be such a major problem, if the key columns that we're interested in, are filled.**
+
+**Bar 5: 12% of the entire dataset's cells are empty. This is not such a big problem, if the key columns that we're interested in, are filled.**
