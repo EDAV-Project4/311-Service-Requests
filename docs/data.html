@@ -232,29 +232,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ol type="1">
 <li>Which borough has the most complaints, and the least?</li>
 </ol>
-<p>We will plot the Borough features (eg. Borough) with a bar chart, sorted in descending order, to see which boroughs have the most/least complaints over the given time period. As this Borough feature has no missing values, we can use it to plot, without needing any data imputation.</p>
+<p>We will plot the Borough features (eg. Borough) with a bar chart, sorted in descending order, to see which boroughs have the most/least complaints over the given time period. As this Borough feature has no missing values, we can use it to plot, without needing any data imputation. Locations with high number of complaints, may be less desirable to live in.</p>
 <ol start="2" type="1">
 <li>Which complaint types are the most numerous, and the least?</li>
 </ol>
-<p>Similar to question 1, we can use a bar chart to do this exploration. We can use the feature “Complaint Type” for this visualisation.</p>
+<p>Similar to question 1, we can use a bar chart to do this exploration. We can use the feature “Complaint Type” for this visualisation. Certain complaint types are more significant (eg. persistent loud noises, rat issues), while some might be less bothersome, depending on one’s priorities (eg. illegal parking is less of an issue for student tenants, but more annoying for residents with cars).</p>
 <ol start="3" type="1">
-<li>What are the locations that most complaints are associated with?</li>
+<li>What are the locations that various complaint types are associated with?</li>
 </ol>
-<p>We will make use of address features (eg. Borough, Street Name), and the Complaint Type feature, to plot multiple heatmaps (1 for each address feature). The higher the color intensity, the worse the area in terms of complaint count. Since Borough and Street Name features have very few missing values (0-3%), our plots would be a comprehensive representation of the dataset.</p>
+<p>We will make use of address features (eg. Borough, Street Name), and the Complaint Type feature, to plot multiple heatmaps (1 for each address feature). The higher the color intensity, the worse the area in terms of that Complaint Type’s count. Since Borough and Street Name features have very few missing values (0-3%), our plots would be a comprehensive representation of the dataset. Locations with high number of significant complaints, may be less desirable to live in.</p>
 <ol start="4" type="1">
 <li>Proportion of complaints that were closed by different departments?</li>
 </ol>
-<p>We can plot the Agency feature, against the Complaint Type and the Status feature, using a mosaic plot, to see the types of complaints successfully closed/left unclosed by each agency.</p>
+<p>We can plot the Agency feature, against the Complaint Type and the Status feature, using a mosaic plot, to see the types of complaints successfully closed/left unclosed by each agency. A low closure count may indicate ineffective responses by the authorities, and may not bode well for people living in that area especially if the complaints are serious in nature (eg. rodent issues).</p>
 <ol start="5" type="1">
 <li>Types of complaints that get closed the fastest/slowest, by using the mean resolution time to close a request.</li>
 </ol>
 <p>We can use the Created and Closed Dates features to create a new column “Closing Duration”, aggregate the mean duration for each Complaint Type, and plot the mean Closing Duration against each Complaint Type. If necessary, we may use the median instead of the mean. We can plot this using a box/violin plot.</p>
 <p>But to do so, we first need to pre-process the date related features, and convert the strings into timestamps, so as to calculate the duration.</p>
 <p>We can also plot the mean Closing Duration, against the location features, using a chloropeth map, to see which locations close complaints the fastest/slowest.</p>
+<p>These are also indicators of the effectiveness/responsiveness of the relevant authorities, depending on location and the issue at hand.</p>
 <ol start="6" type="1">
 <li>What are the trends in service requests over time?</li>
 </ol>
-<p>We can plot a time series line chart/ridgeline plot, using the Complaint Types (take the sum eg. for each Borough) plotted against time based features (Created Date, binned into weeks of the year). We could explore adding interactive filters to drill down into each location, to see the trend of different complaint types per location.</p>
+<p>We can plot a time series line chart/ridgeline plot, using the Complaint Types (take the sum eg. for each Borough) plotted against time based features (Created Date, binned into weeks of the year). We could explore adding interactive filters to drill down into each location, to see the trend of different complaint types per location. A persistently high complaint count may be a bad sign for residents in the affected areas, or may indicate ineffective, non-permanent resolutions of issues by the relevant authorities - which all point towards a less-than-pleasant living environment.</p>
+<p>~~~</p>
 <p>For all the above questions, depending on the results that we observe, we may drill down to lower level features. For example, for certain Boroughs with high number of complaints, we can drill down to Street/Zipcode/Community District levels, to investigate the specific areas that contribute most to the issue.</p>
 </section>
 <section id="missing-value-analysis" class="level2" data-number="2.3">
