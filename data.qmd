@@ -18,7 +18,7 @@ As we have such a comprehensive dataset which gets updated daily, there are **34
 2.  Reading such a large dataset in memory also becomes an issue causing RStudio session to crash.
 3.  Multiple columns in the dataset were redundant as they would help us in answering the proposed questions
 4.  Another issue is mentioned on the NYC OpenData website - Due to pandemic call handling modifications, the 'Open Data Channel Type' values may not accurately indicate the channel the Service Request was submitted in for the period starting March 2020.
-5.  Many of the data visualization libraries like ..... fail for big datasets and raise errors. As a result, a subset of the dataset is necessary for visualization.
+5.  Many of the data visualization libraries (eg. VIM, narniar) fail for big datasets and raise errors. As a result, a subset of the dataset is necessary for visualization.
 
 As a result, instead of reading the entire dataset starting with rows from the year 2010 till the current date, we have used a subset of the data of appropriate size (starting from Sept 2023 till Nov 2023).
 
