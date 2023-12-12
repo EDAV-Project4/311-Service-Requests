@@ -1,5 +1,31 @@
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
 # Results
 
+## Clean data
+Since "Facility Type", "Vehicle Type", "Due Date" columns are all having >90% missing values (missing value analysis), we will remove them. 
+
+From the dataset description, they refer to...
+
+Facility Type: If available, this field describes the type of city facility associated to the SR
+
+Vehicle Type: If the incident is a taxi, this field describes the type of TLC vehicle.
+
+Due Date: Date when responding agency is expected to update the SR. This is based on the Complaint Type and internal Service Level Agreements (SLAs).
+
+"Landmark" has >40% missing values. But since other address columns (eg. Longitude, Latitude, Incident Address) are proxies of it, we can remove "Landmark".
+
+Landmark: If the incident location is identified as a Landmark the name of the landmark will display here
+
+Community Boards (each taking charge of 1 Community District, or CD), handle the "day-to-day processing of citizen complaints and requests for municipal services". At the sub-borough level, we will look at how well each CD manages their municipal issues.
+["link"](https://www.nyc.gov/site/queenscb6/about/frequently-asked-questions-faq.page)
+
+Since we're only looking at the New York City dataset, the City column is redundant, and can be removed too.
+
+```{r message = FALSE}
+df <- df[, !(colnames(df) %in% c("Vehicle Type", "Due Date", "Facility Type", "Landmark", "City"))]
+```
 ## template section
 
 # Interactive component in D3
