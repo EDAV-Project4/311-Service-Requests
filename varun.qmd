@@ -82,10 +82,15 @@ complaint_duration[order(complaint_duration$Closing_Duration, decreasing = FALSE
 
 
 ```{r}
- 
-library(ggridges)
-ggplot(service_data, aes(x = Closing_Duration,y = `Complaint Type`)) +
-  geom_density_ridges() 
+service_data %>% na.omit(service_data) %>% 
+ggplot(aes(x = Borough ,y = Closing_Duration)) +
+  geom_boxplot() +
+  ggtitle("Boxplot for Ticket Closing Duration for each Borough")+
+  labs(
+    x = "Borough",
+    y = "Closing Duration (Days)"
+  ) +
+  theme_bw()
 ```
 
 

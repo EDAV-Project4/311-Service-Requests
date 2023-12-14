@@ -43,7 +43,7 @@ complaint_duration[order(complaint_duration$Closing_Duration, decreasing = FALSE
     fct_reorder(`Complaint Type`, Closing_Duration, .desc = TRUE)
   ))) +
   geom_point() +
-  xlab("Closing Duration") +
+  xlab("Closing Duration (Days)") +
   ylab("Complaint Type") +
   ggtitle("Mean Time for Complaint Resolution")+
   theme_bw()
@@ -60,7 +60,7 @@ complaint_duration[order(complaint_duration$Closing_Duration, decreasing = TRUE)
   geom_point() +
   xlab("Closing Duration") +
   ylab("Complaint Type") +
-  ggtitle("Mean Time for Complaint Resolution")+
+  ggtitle("Mean Time for Complaint Resolution (Days)")+
   theme_bw()
 
 ```
@@ -70,30 +70,21 @@ complaint_duration[order(complaint_duration$Closing_Duration, decreasing = TRUE)
 
 **Resolution time for tickets across Boroughs**
 ```{r message=FALSE, warning=FALSE}
-service_borough <- service_data %>% 
-	group_by(Borough) %>%
-	summarise(mn_cd = mean(Closing_Duration,na.rm = TRUE)) %>% 
-  arrange(desc(mn_cd)) %>%
-  rename(
-    value = mn_cd
-  ) %>% 
-  drop_na(value)
-
-service_borough$b_id <- "0"
-service_borough$b_id[service_borough$Borough == 'MANHATTAN'] <- "1"
-service_borough$b_id[service_borough$Borough == 'BRONX'] <- "2"
-service_borough$b_id[service_borough$Borough == 'BROOKLYN'] <- "3"
-service_borough$b_id[service_borough$Borough == 'QUEENS'] <- "4"
-service_borough$b_id[service_borough$Borough == 'STATEN ISLAND'] <- "5"
-
-nyc_boundaries(geography = "nta") %>% 
-  left_join(service_borough, by = c("borough_id" = "b_id")) %>% 
-  ggplot() +
-  geom_sf(aes(fill = value)) +
-  scale_fill_viridis_c(name = "Mean Resolution Time (Days)", option = "inferno",direction=-1) +
-  theme_void() +
-  labs(title = "How fast is the ticket resolution for each Borough?")
+service_data %>% na.omit(service_data) %>% 
+ggplot(aes(x = Borough ,y = Closing_Duration)) +
+  geom_boxplot() +
+  ggtitle("Boxplot for Ticket Closing Duration for each Borough")+
+  labs(
+    x = "Borough",
+    y = "Ticket Resolution Duration (Days)"
+  ) +
+  theme_bw()
 ```
+
+**Comments:**
+
+From the boxplots we can see that the median resolution time across different boroughs is nearly the same (Between 1-2 days). The outliers are mainly due to issues visualized in the previous Cleveland plot. A ridgeline plot was considered earlier to visualize instead of the boxplot but since most of the resolution times are close to 1-2 days, there was not a lot of information that could be derived from such a distribution.
+
 
 **Resolution time for tickets across Districts**
 ```{r message=FALSE, warning=FALSE}
@@ -138,19 +129,12 @@ ggplot(service_data, aes(x = week_number)) +
   theme_bw()
 ```
 
-**Histogram for ticket creations every week across different Boroughs**
-```{r message=FALSE, warning=FALSE}
-ggplot(service_data, aes(x = week_number)) +
-  geom_bar(color = "black", fill = "#CC5500") +
-  facet_wrap( ~ Borough) +
-  ggtitle("Histogram for 311 Tickets created every week (Sept-Nov)") +
-  theme_bw()
-```
-
 
 **Line plot for easy comparison of ticket creation every week across different Boroughs**
 
 ```{r}
+
+custom_colors <- c("QUEENS" = "yellow","MANHATTAN"="blue","BRONX"="brown","STATEN ISLAND" = "green", "BROOKLYN" = "red")
 aggregate(
   service_data$`Complaint Type`,
   by = list(service_data$Borough, service_data$week_number),
@@ -161,6 +145,7 @@ aggregate(
          Borough = Group.1) %>%
   ggplot(aes(x = week_number, y = issue_count, color = Borough)) +
   geom_line() +
+  scale_color_manual(values = custom_colors) +
   ggtitle("Tickets created in different Boroughs for each week (Sept-Nov)") +
   labs(x = "Week Number", y = "Created Tickets count") +
   theme_bw()
@@ -195,6 +180,7 @@ aggregate(
   rename(Issue = Group.1,week_number = Group.3,Borough = Group.2, Tickets = x) %>% 
   inner_join(week_40_highest,by=c("Borough" = "Borough","Tickets" = "Tickets"))
 ```
+
 **Comment**:
 
 Although there are many issues contributing to the peak on Week 40, Illegal Parking contributes the most
