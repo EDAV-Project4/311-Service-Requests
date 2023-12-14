@@ -61,7 +61,7 @@ ggplot(df %>%
 ```
 Brooklyn appears to receive the most 311 complaints, followed by Queens, Manhattan, the Bronx. Staten Island seems to receive the least complaints.
 
-If we zoom into each Borough, and see which areas within them receive more complaints (see q5)...
+If we zoom into each Borough, and see which areas within them receive more complaints (see q5).
 
 ## 2.  Which complaint types are the most numerous, and the least?
 ```{r message = FALSE, fig.height=20, fig.width=10}

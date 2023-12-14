@@ -1,1 +1,398 @@
 # Results
+
+## template section
+
+# Interactive component in D3
+
+## template section
+
+# Conclusion
+
+## template section
+
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+```{r}
+options(warn = -1)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+```
+
+
+```{r}
+# service_data = read_csv("C:\\Users\\varun\\Downloads\\311_Service_Requests_from_20230901_to_20231129.csv",show_col_types = FALSE)
+
+service_data = read_csv('I:/My Drive/MSDS/Study/Fall23/EDAV/Homework/final_project/311_Service_Requests_from_20230901_to_20231129.csv', show_col_types = FALSE)
+
+service_data <- service_data[,!(
+  colnames(service_data) %in% c("Vehicle Type", "Due Date", "Facility Type", "Landmark", "City")
+)] %>% 
+  filter(Borough!="Unspecified")
+
+```
+
+
+## Clean data
+Since "Facility Type", "Vehicle Type", "Due Date" columns are all having >90% missing values (missing value analysis), we will remove them. 
+
+From the dataset description, they refer to...
+
+Facility Type: If available, this field describes the type of city facility associated to the SR
+
+Vehicle Type: If the incident is a taxi, this field describes the type of TLC vehicle.
+
+Due Date: Date when responding agency is expected to update the SR. This is based on the Complaint Type and internal Service Level Agreements (SLAs).
+
+"Landmark" has >40% missing values. But since other address columns (eg. Longitude, Latitude, Incident Address) are proxies of it, we can remove "Landmark".
+
+Landmark: If the incident location is identified as a Landmark the name of the landmark will display here
+
+Community Boards (each taking charge of 1 Community District, or CD), handle the "day-to-day processing of citizen complaints and requests for municipal services". At the sub-borough level, we will look at how well each CD manages their municipal issues.
+["link"](https://www.nyc.gov/site/queenscb6/about/frequently-asked-questions-faq.page)
+
+Since we're only looking at the New York City dataset, the City column is redundant, and can be removed too.
+
+There are some rows with Borough and Status values being "Unspecified". But they take up such a small % of the total number of rows (~0% from missing value analysis), so we will remove these rows too.
+
+```{r message = FALSE}
+service_data <- service_data[, !(colnames(service_data) %in% c("Vehicle Type", "Due Date", "Facility Type", "Landmark", "City"))]
+
+# see count of number of values. in Borough, Status column
+table(service_data[["Borough"]])
+table(service_data[["Status"]])
+
+# remove rows with Borough / Status = "Unspecified"
+service_data <- service_data[!grepl("Unspecified", service_data$Borough),]
+service_data <- service_data[!grepl("Unspecified", service_data$Status),]
+```
+
+
+## 1.  Which borough has the most complaints, and the least?
+```{r message = FALSE}
+# library(ggplot2)
+library(forcats)
+# library(dplyr)
+
+# specify colors for boroughs
+custom_colors <- c("QUEENS" = "yellow", "MANHATTAN" = "blue", "BRONX" = "brown", "STATEN ISLAND" = "green", "BROOKLYN" = "red")
+
+# plot bar chart
+ggplot(service_data %>%
+         group_by(Borough) %>% # to include another dimension (but it tends to be too cluttered), add eg: , `Complaint Type`
+         summarise(Total_Complaints = n()), 
+       aes(x = reorder(Borough, -Total_Complaints), y = Total_Complaints/1000, fill = Borough)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Total Complaints by NYC Borough",
+       x = "Borough",
+       y = "Number of Complaints (000s)") +
+  scale_fill_manual(values = custom_colors) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme_minimal() # facetgrid: + facet_grid(Borough ~ `Complaint Type`)
+```
+Brooklyn appears to receive the most 311 complaints, followed by Queens, Manhattan, the Bronx. Staten Island seems to receive the least complaints.
+
+If we zoom into each Borough, and see which areas within them receive more complaints (see q5).
+
+
+## 2.  Which complaint types are the most numerous, and the least?
+```{r message = FALSE, fig.height=20, fig.width=10}
+ggplot(service_data %>%
+         mutate(`Complaint Type` = tolower(`Complaint Type`)) %>%
+         group_by(`Complaint Type`) %>%
+         summarise(Total_Complaints = n()), 
+       aes(x = Total_Complaints/1000, y = reorder(`Complaint Type`, Total_Complaints), fill = `Complaint Type`)) +
+  geom_col(position = position_dodge(width = 20)) +
+  labs(title = "Total Complaints by Complaint Type",
+       x = "Number of Complaints (000s)",
+       y = "Complaint Type") +
+  scale_fill_manual(values = custom_colors) +
+  theme(axis.text.y = element_text(vjust = 0.5))  # Adjust hjust and vjust as needed +
+  theme_minimal()
+```
+On an aggregate level across all boroughs, the most common complaints range from illegal parking, noise in residential spaces, (presumably, the lack of) hot water, to also blocked driveways. In general, noise/cleanliness/water issues are the most frequent complaints, as seen from the top 10-20 bars. 
+
+Towards the bottom of the bar plot, we see that certain issues amount to fewer cases of complaints. These include highway/snow/oil spill issues. This is understandable, given that they are less "day-to-day" issues.
+
+To drill in further, we can facet by boroughs. However, there are clearly too many complaint types. Focusing on just the top 5, for each borough...
+
+
+```{r message = FALSE, fig.height=6, fig.width=8}
+library(tidytext)
+
+service_data_top <- service_data %>%
+  mutate(`Complaint Type` = tolower(`Complaint Type`)) %>%
+  group_by(Borough, `Complaint Type`) %>%
+  summarise(Total_Complaints = n()) %>%
+  group_by(Borough) %>%
+  top_n(5, wt = Total_Complaints) %>%
+  arrange(Borough, desc(Total_Complaints)) %>%
+  mutate(`Complaint Type` = factor(`Complaint Type`, levels = unique(`Complaint Type`)))
+
+# Get a vector of unique Boroughs ordered by the total complaints
+ordered_boroughs <- service_data_top %>%
+  arrange(Borough) %>%
+  group_by(Borough) %>%
+  summarise(total_complaints = sum(Total_Complaints)) %>%
+  arrange(desc(total_complaints)) %>%
+  pull(Borough)
+
+# Use reorder_within to sort bars within each facet
+ggplot(service_data_top, aes(x = Total_Complaints, y = reorder_within(`Complaint Type`, Total_Complaints, Borough), fill = `Complaint Type`)) +
+  geom_col() +
+  labs(title = "Top 5 Complaint Types by Borough",
+       x = "Number of Complaints",
+       y = "Complaint Type") +
+  scale_fill_manual(values = custom_colors) +
+  theme_minimal() +
+  facet_wrap(~Borough, scales = "free_y", ncol = 1, strip.position = "bottom") +
+  theme(axis.text.y = element_text(vjust = 0.5)) +
+  theme_minimal()
+```
+
+## 3.  What are the locations that most complaints are associated with?
+
+We explore locations by their Street Names (eg. Seventh Avenue), not Incident Address (eg. 31 Seventh Avenue, 139 Seventh Avenue), as the latter would have too many unique categories. For the initial plots here, we do not use zip code or longitude/latitude as they are less interpretable (we will plot that on a chloropleth later).
+
+Since the number of missing rows in Street Names is low, as seen from the missing vales analysis (~3.7% rows missing), we shall omit it from this section's analysis.
+
+```{r message = FALSE}
+
+# remove rows with missing Street Name
+service_data_temp <- service_data[complete.cases(df$`Street Name`), ]
+```
+
+```{r message = FALSE}
+service_data_top <- service_data_temp %>%
+  mutate(`Street Name` = tolower(`Street Name`)) %>%
+  group_by(Borough, `Street Name`) %>%
+  summarise(Total_Complaints = n()) %>%
+  group_by(Borough) %>%
+  top_n(5, wt = Total_Complaints) %>%
+  arrange(Borough, desc(Total_Complaints)) %>%
+  mutate(`Complaint Type` = factor(`Street Name`, levels = unique(`Street Name`)))
+
+# Get a vector of unique Boroughs ordered by the total complaints
+ordered_boroughs <- service_data_top %>%
+  arrange(Borough) %>%
+  group_by(Borough) %>%
+  summarise(total_complaints = sum(Total_Complaints)) %>%
+  arrange(desc(total_complaints)) %>%
+  pull(Borough)
+
+# Use reorder_within to sort bars within each facet
+ggplot(service_data_top, aes(x = Total_Complaints, y = reorder_within(`Street Name`, Total_Complaints, Borough), fill = `Street Name`)) +
+  geom_col() +
+  labs(title = "Top 5 Complaint Types by Borough",
+       x = "Number of Complaints",
+       y = "Complaint Type") +
+  scale_fill_manual(values = custom_colors) +
+  theme_minimal() +
+  facet_wrap(~Borough, scales = "free_y", ncol = 1, strip.position = "bottom") +
+  theme(axis.text.y = element_text(vjust = 0.5)) +
+  theme_minimal()
+```
+We see from here some of the most complained streets in each borough, eg. Ocean Avenue in Brooklyn. But this can also be high, due to the fact that some of them are long, main roads in each Borough (eg. Broadway, Amsterdam Avenue in Manhattan). We can plot a chloropleth to get a better, geographical view of problem areas.
+
+
+```{r}
+library(lubridate)
+
+service_data$`Closed Date` <- date(mdy_hms(service_data$`Closed Date`,tz=Sys.timezone()))
+service_data$`Created Date` <- date(mdy_hms(service_data$`Created Date`,tz=Sys.timezone()))
+service_data$Closing_Duration <- service_data$`Closed Date` - service_data$`Created Date`
+```
+
+
+```{r}
+library(vcd)
+library(ggplot2)
+library(grid)
+
+service_data_agg <- aggregate(
+  service_data$Status,
+  by = list(service_data$Agency,service_data$`Complaint Type`,service_data$Status),
+  FUN = length
+) %>% 
+  rename(Agency = Group.1, Issue = Group.2, Status = Group.3, Freq = x)
+
+vcd::mosaic(Status~Agency + Issue, direction = c("v","v","h"), service_data_agg)
+
+```
+
+
+```{r}
+complaint_duration <- service_data %>%
+  group_by(`Complaint Type`) %>%
+  summarise(across(Closing_Duration,mean, na.rm=TRUE))
+```
+
+```{r}
+complaint_duration[order(complaint_duration$Closing_Duration, decreasing = TRUE), ]
+```
+
+
+```{r}
+complaint_duration[order(complaint_duration$Closing_Duration, decreasing = FALSE),] %>%
+  slice(1:40) %>%
+  ggplot(aes(x = Closing_Duration, y = fct_rev(
+    fct_reorder(`Complaint Type`, Closing_Duration, .desc = FALSE)
+  ))) +
+  geom_point() +
+  xlab("Closing Duration") +
+  ylab("Complaint Type") +
+  ggtitle("Mean Time for Complaint Resolution")+
+  theme_bw()
+
+```
+
+
+```{r}
+service_data %>% na.omit(service_data) %>% 
+ggplot(aes(x = Borough ,y = Closing_Duration)) +
+  geom_boxplot() +
+  ggtitle("Boxplot for Ticket Closing Duration for each Borough")+
+  labs(
+    x = "Borough",
+    y = "Closing Duration (Days)"
+  ) +
+  theme_bw()
+```
+
+
+```{r}
+library(sf)
+library(nycgeo)
+
+service_borough <- service_data %>% 
+	group_by(Borough) %>%
+	summarise(mn_cd = mean(Closing_Duration,na.rm = TRUE)) %>% 
+  arrange(desc(mn_cd)) %>%
+  rename(
+    value = mn_cd
+  ) %>% 
+  drop_na(value)
+
+service_borough$b_id[service_borough$Borough == 'MANHATTAN'] <- "1"
+service_borough$b_id[service_borough$Borough == 'BRONX'] <- "2"
+service_borough$b_id[service_borough$Borough == 'BROOKLYN'] <- "3"
+service_borough$b_id[service_borough$Borough == 'QUEENS'] <- "4"
+service_borough$b_id[service_borough$Borough == 'STATEN ISLAND'] <- "5"
+
+nyc_boundaries(geography = "nta") %>% 
+  left_join(service_borough, by = c("borough_id" = "b_id")) %>% 
+  ggplot() +
+  geom_sf(aes(fill = value)) +
+  scale_fill_viridis_c(name = "Mean Resolution Time (Days)", option = "inferno",direction=-1) +
+  theme_void() +
+  labs(title = "How fast is the ticket resolution for each Borough?")
+
+```
+
+
+```{r}
+service_district <- service_data %>%
+  group_by(`City Council Districts`) %>%
+  summarise(mn_cd = mean(Closing_Duration, na.rm = TRUE)) %>%
+  arrange(desc(mn_cd)) %>%
+  rename(value = mn_cd) %>%
+  drop_na(value) %>%
+  mutate(`City Council Districts` = as.character(`City Council Districts`))
+
+nyc_boundaries(geography = "council") %>%
+  left_join(service_district,
+            by = c("council_dist_id" = "City Council Districts")) %>%
+  ggplot() +
+  geom_sf(aes(fill = value)) +
+  scale_fill_viridis_c(name = "Mean Resolution Time (Days)",
+                       option = "inferno",
+                       direction = -1) +
+  theme_void() +
+  labs(title = "How fast is the ticket resolution for each District?")
+```
+
+
+
+```{r}
+service_data$week_number <- week(ymd(service_data$`Created Date`))
+```
+
+
+```{r}
+ggplot(service_data, aes(x = week_number)) +
+  geom_histogram(
+    aes(y = after_stat(density)),
+    color = "black",
+    fill = "#CC5500",
+    binwidth = 1,
+    right = FALSE
+  ) +
+  ggtitle("Density Histogram for 311 Tickets created every week (Sept-Nov)") +
+  theme_bw()
+```
+
+
+
+```{r}
+library(ggridges)
+service_data %>%
+  filter(Borough != "Unspecified") %>%
+  ggplot(aes(x = week_number, y = Borough)) +
+  geom_density_ridges(fill = "blue",
+                      alpha = .5,
+                      scale = 1.2) +
+  ggtitle("2012 continental GDP") +
+  ylab("Continent")
+
+```
+
+
+```{r}
+ggplot(service_data, aes(x = week_number)) +
+  geom_bar(color = "black", fill = "#CC5500") +
+  facet_wrap( ~ Borough) +
+  ggtitle("Histogram for 311 Tickets created every week (Sept-Nov)") +
+  theme_bw()
+```
+
+
+```{r}
+aggregate(
+  service_data$`Complaint Type`,
+  by = list(service_data$Borough, service_data$week_number),
+  FUN = length
+) %>%
+  rename(issue_count = x,
+         week_number = Group.2,
+         Borough = Group.1) %>%
+  ggplot(aes(x = week_number, y = issue_count, color = Borough)) +
+  geom_line() +
+  ggtitle("Tickets created in different Boroughs for each week (Sept-Nov)") +
+  labs(x = "Week Number", y = "Created Tickets count") +
+  theme_bw()
+```
+
+```{r}
+week_40_highest <- aggregate(
+  service_data$`Complaint Type`,
+  by = list(service_data$`Complaint Type`,service_data$Borough, service_data$week_number),
+  FUN = length
+) %>% 
+  filter(Group.3 == 40) %>% 
+  group_by(Group.2) %>% summarise(max_x = max(x),.groups = 'drop') %>% 
+  arrange(desc(max_x)) %>% 
+  rename(Borough = Group.2, Tickets = max_x)
+
+aggregate(
+  service_data$`Complaint Type`,
+  by = list(service_data$`Complaint Type`,service_data$Borough, service_data$week_number),
+  FUN = length
+) %>% 
+  filter(Group.3 == 40) %>% 
+  arrange(desc(x)) %>% 
+  rename(Issue = Group.1,week_number = Group.3,Borough = Group.2, Tickets = x) %>% 
+  inner_join(week_40_highest,by=c("Borough" = "Borough","Tickets" = "Tickets"))
+```
+
