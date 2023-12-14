@@ -39,7 +39,7 @@ Due Date: Date when responding agency is expected to update the SR. This is base
 
 Landmark: If the incident location is identified as a Landmark the name of the landmark will display here
 
-Community Boards (each taking charge of 1 Community District, or CD), handle the "day-to-day processing of citizen complaints and requests for municipal services". At the sub-borough level, we will look at how well each CD manages their municipal issues.
+Community Boards (each taking charge of 1 Community District, or CD), together with the City Council Districts, handle the "day-to-day processing of citizen complaints and requests for municipal services". At the sub-borough level, we will look at how well each CD manages their municipal issues.
 ["link"](https://www.nyc.gov/site/queenscb6/about/frequently-asked-questions-faq.page)
 
 Since we're only looking at the New York City dataset, the City column is redundant, and can be removed too.
@@ -63,7 +63,7 @@ service_data <- service_data %>%
 
 ```
 
-## 1.  Which borough has the most complaints, and the least?
+## (Q1) Which borough has the most complaints, and the least?
 ```{r message = FALSE}
 # library(ggplot2)
 library(forcats)
@@ -83,7 +83,7 @@ ggplot(service_data %>%
        y = "Number of Complaints (000s)") +
   scale_fill_manual(values = custom_colors) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  theme_minimal() # facetgrid: + facet_grid(Borough ~ `Complaint Type`)
+  theme_minimal()
 ```
 **Comments:**
 
@@ -92,7 +92,7 @@ Brooklyn appears to receive the most 311 complaints, followed by Queens, Manhatt
 If we zoom into each Borough, we can see which districts within them receive more complaints.
 
 
-## 2.  Which complaint types are the most numerous, and the least?
+## (Q2) Which complaint types are the most numerous, and the least?
 ```{r message = FALSE, fig.height=20, fig.width=10}
 ggplot(service_data %>%
          # mutate(`Complaint Type` = tolower(`Complaint Type`)) %>%
@@ -104,7 +104,7 @@ ggplot(service_data %>%
        x = "Number of Complaints (000s)",
        y = "Complaint Type") +
   scale_fill_manual(values = custom_colors) +
-  theme(axis.text.y = element_text(vjust = 0.5))  # Adjust hjust and vjust as needed +
+  theme(axis.text.y = element_text(vjust = 0.5)) + # Adjust hjust and vjust as needed
   theme_minimal()
 ```
 
@@ -148,7 +148,11 @@ ggplot(service_data_top, aes(x = Total_Complaints, y = reorder_within(`Complaint
   theme(axis.text.y = element_text(vjust = 0.5)) +
   theme_minimal()
 ```
-## 3.  What are the locations that most complaints are associated with?
+**Comments:**
+
+We see that again, illegal parking, lack of hot water, and residential noise rank amongst the top 5 complaints across all 5 boroughs. This would certainly be something to look out for, for anyone who's looking to stay in these boroughs. But can we do 1 level lower, to see which streets (in these boroughs) contain many of these complaints?
+
+## (Q3) What are the locations that most complaints are associated with?
 
 **Comments:**
 
@@ -202,7 +206,7 @@ service_data$`Created Date` <- date(mdy_hms(service_data$`Created Date`,tz=Sys.t
 service_data$Closing_Duration <- service_data$`Closed Date` - service_data$`Created Date`
 ```
 
-## 4.  What is the proportion of complaints that were handled by different departments?
+## (Q4) What is the proportion of complaints that were handled by different departments?
 ```{r message = FALSE}
 ggplot(service_data %>%
          group_by(Agency) %>%
@@ -217,10 +221,6 @@ ggplot(service_data %>%
   theme_minimal()
 ```
 
-**Comments:**
-
-We see here that the number of complaints managed by the NYPD was the most, followed by the HPD, and then the DSNY. DHS, TLC, EDC, DCWP, and DOE seem to handle the least number of complaints. The various departments and their abbreviations are as follows...
-
 ```{r message = FALSE}
 library(knitr)
 
@@ -231,8 +231,11 @@ service_data_agencies <- distinct(select(service_data, Agency, `Agency Name`))
 kable(service_data_agencies, caption = "Agencies", format = "html")
 ```
 
+##Comments:##
 
-## Q5. Types of complaints that get closed the fastest/slowest, by using the mean resolution time to close a request.
+When plotting this with a mosaic plot, we realised how messy it would look, given the huge number of 
+
+## (Q5) Types of complaints that get closed the fastest/slowest, by using the mean resolution time to close a request.
 
 
 **Complaints that get resolved the fastest**
@@ -339,8 +342,9 @@ nyc_boundaries(geography = "council") %>%
 
 The above analysis for q5, culminates in this chloropleth map, that shows how long the various districts of NYC's boroughs take to resolve 311 service requests.
 
+We see that the mean complaint resolution time corroborates with the above boxplot/ridgeline plots, with the mean duration hovering below 5 days. However, the darkest colored regions, eg. north Staten Island, west Brooklyn, southwest Queens, southern Manhattan and Bronx, resolve 311 issues the slowest on average. Residents-to-be may want to keep this (and knowledge from Q3, boroughs and their types of high complaint counts, and their respective streets with high complaint counts) in mind, when deciding where to stay.
 
-## Q6. What are the trends in service requests over time?
+## (Q6) What are the trends in service requests over time?
 
 ```{r}
 service_data$week_number <- week(ymd(service_data$`Created Date`))
@@ -418,4 +422,4 @@ aggregate(
 
 Although there are many issues contributing to the peak on Week 40, Illegal Parking contributes the most. This corroborates with our earlier analysis, where Illegal Parking features as 1 of the most common complaints in NYC.
 
-A more thorough analysis would have been to explore how the distribution of the various complaint types vary across the months (perhaps via a parallel plot, or an alluvial diagram). But due to the sheer number of complaint categories, the graphs would have looked too cluttered. Hence, we focus our analysis on just certain weeks of interest (eg. week 40).
+A more thorough analysis would have been to explore how the distribution of the various complaint types vary across the months/weeks (perhaps via a parallel plot, or an alluvial diagram). But due to the sheer number of complaint categories, the graphs would have looked too cluttered. Hence, we focus our analysis on just aggregated views of certain weeks of interest (eg. week 40).
