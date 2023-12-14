@@ -11,6 +11,7 @@
 ## template section
 
 ```{r}
+options(warn = -1)
 library(tidyverse)
 library(ggplot2)
 library(dplyr)
@@ -18,20 +19,13 @@ library(dplyr)
 
 
 ```{r}
-service_data = read_csv("C:\\Users\\varun\\Downloads\\311_Service_Requests_from_20230901_to_20231129.csv")
+service_data = read_csv("C:\\Users\\varun\\Downloads\\311_Service_Requests_from_20230901_to_20231129.csv",show_col_types = FALSE)
 
-service_data <- service_data[, !(colnames(service_data) %in% c("Vehicle Type", "Due Date", "Facility Type", "Landmark", "City"))]
-```
+service_data <- service_data[,!(
+  colnames(service_data) %in% c("Vehicle Type", "Due Date", "Facility Type", "Landmark", "City")
+)] %>% 
+  filter(Borough!="Unspecified")
 
-
-```{r}
-library(vcd)
-library(ggplot2)
-library(grid)
-
-counts2 <- service_data |>
-  group_by(Agency, Status) |>
-  summarize(Freq = count())
 ```
 
 
@@ -43,6 +37,24 @@ service_data$`Created Date` <- date(mdy_hms(service_data$`Created Date`,tz=Sys.t
 service_data$Closing_Duration <- service_data$`Closed Date` - service_data$`Created Date`
 ```
 
+
+```{r}
+library(vcd)
+library(ggplot2)
+library(grid)
+
+service_data_agg <- aggregate(
+  service_data$Status,
+  by = list(service_data$Agency,service_data$`Complaint Type`,service_data$Status),
+  FUN = length
+) %>% 
+  rename(Agency = Group.1, Issue = Group.2, Status = Group.3, Freq = x)
+
+vcd::mosaic(Status~Agency + Issue, direction = c("v","v","h"), service_data_agg)
+
+```
+
+
 ```{r}
 complaint_duration <- service_data %>%
   group_by(`Complaint Type`) %>%
@@ -51,37 +63,42 @@ complaint_duration <- service_data %>%
 
 ```{r}
 complaint_duration[order(complaint_duration$Closing_Duration, decreasing = TRUE), ]
-
 ```
+
+
 ```{r}
-complaint_duration[order(complaint_duration$Closing_Duration, decreasing = FALSE), ] %>% 
-  slice(1:40) %>% 
-  ggplot(aes(x = Closing_Duration, y = fct_rev(fct_reorder(`Complaint Type`,Closing_Duration,.desc = FALSE))))+
-  geom_point()+
+complaint_duration[order(complaint_duration$Closing_Duration, decreasing = FALSE),] %>%
+  slice(1:40) %>%
+  ggplot(aes(x = Closing_Duration, y = fct_rev(
+    fct_reorder(`Complaint Type`, Closing_Duration, .desc = FALSE)
+  ))) +
+  geom_point() +
   xlab("Closing Duration") +
   ylab("Complaint Type") +
-  ggtitle("Mean Time for Complaint Resolution")
+  ggtitle("Mean Time for Complaint Resolution")+
   theme_bw()
 
 ```
 
-```{r}
- 
-library(ggridges)
-ggplot(service_data, aes(x = Closing_Duration,y = `Complaint Type`)) +
-  geom_density_ridges() 
-```
 
 ```{r}
-
+service_data %>% na.omit(service_data) %>% 
+ggplot(aes(x = Borough ,y = Closing_Duration)) +
+  geom_boxplot() +
+  ggtitle("Boxplot for Ticket Closing Duration for each Borough")+
+  labs(
+    x = "Borough",
+    y = "Closing Duration (Days)"
+  ) +
+  theme_bw()
 ```
+
 
 ```{r}
 library(sf)
 library(nycgeo)
 
 service_borough <- service_data %>% 
-  filter(Borough!="Undefined") %>%
 	group_by(Borough) %>%
 	summarise(mn_cd = mean(Closing_Duration,na.rm = TRUE)) %>% 
   arrange(desc(mn_cd)) %>%
@@ -105,36 +122,109 @@ nyc_boundaries(geography = "nta") %>%
   labs(title = "How fast is the ticket resolution for each Borough?")
 
 ```
+
+
 ```{r}
-service_district <- service_data %>% 
-	group_by(`City Council Districts`) %>%
-	summarise(mn_cd = mean(Closing_Duration,na.rm = TRUE)) %>% 
+service_district <- service_data %>%
+  group_by(`City Council Districts`) %>%
+  summarise(mn_cd = mean(Closing_Duration, na.rm = TRUE)) %>%
   arrange(desc(mn_cd)) %>%
-  rename(
-    value = mn_cd
-  ) %>% 
-  drop_na(value) %>% 
+  rename(value = mn_cd) %>%
+  drop_na(value) %>%
   mutate(`City Council Districts` = as.character(`City Council Districts`))
 
-#service_district$b_id[service_district$Borough == 'MANHATTAN'] <- "1"
-#service_district$b_id[service_district$Borough == 'BRONX'] <- "2"
-#service_district$b_id[service_district$Borough == 'BROOKLYN'] <- "3"
-#service_district$b_id[service_district$Borough == 'QUEENS'] <- "4"
-#service_district$b_id[service_district$Borough == 'STATEN ISLAND'] <- "5"
-
-nyc_boundaries(geography = "council") %>% 
-  left_join(service_district, by = c("council_dist_id" = "City Council Districts")) %>% 
+nyc_boundaries(geography = "council") %>%
+  left_join(service_district,
+            by = c("council_dist_id" = "City Council Districts")) %>%
   ggplot() +
   geom_sf(aes(fill = value)) +
-  scale_fill_viridis_c(name = "Mean Resolution Time (Days)", option = "inferno",direction=-1) +
+  scale_fill_viridis_c(name = "Mean Resolution Time (Days)",
+                       option = "inferno",
+                       direction = -1) +
   theme_void() +
   labs(title = "How fast is the ticket resolution for each District?")
-
 ```
 
 
 
 ```{r}
+service_data$week_number <- week(ymd(service_data$`Created Date`))
+```
 
+
+```{r}
+ggplot(service_data, aes(x = week_number)) +
+  geom_histogram(
+    aes(y = after_stat(density)),
+    color = "black",
+    fill = "#CC5500",
+    binwidth = 1,
+    right = FALSE
+  ) +
+  ggtitle("Density Histogram for 311 Tickets created every week (Sept-Nov)") +
+  theme_bw()
+```
+
+
+
+```{r}
+library(ggridges)
+service_data %>%
+  filter(Borough != "Unspecified") %>%
+  ggplot(aes(x = week_number, y = Borough)) +
+  geom_density_ridges(fill = "blue",
+                      alpha = .5,
+                      scale = 1.2) +
+  ggtitle("2012 continental GDP") +
+  ylab("Continent")
+
+```
+
+
+```{r}
+ggplot(service_data, aes(x = week_number)) +
+  geom_bar(color = "black", fill = "#CC5500") +
+  facet_wrap( ~ Borough) +
+  ggtitle("Histogram for 311 Tickets created every week (Sept-Nov)") +
+  theme_bw()
+```
+
+
+```{r}
+aggregate(
+  service_data$`Complaint Type`,
+  by = list(service_data$Borough, service_data$week_number),
+  FUN = length
+) %>%
+  rename(issue_count = x,
+         week_number = Group.2,
+         Borough = Group.1) %>%
+  ggplot(aes(x = week_number, y = issue_count, color = Borough)) +
+  geom_line() +
+  ggtitle("Tickets created in different Boroughs for each week (Sept-Nov)") +
+  labs(x = "Week Number", y = "Created Tickets count") +
+  theme_bw()
+```
+
+```{r}
+week_40_highest <- aggregate(
+  service_data$`Complaint Type`,
+  by = list(service_data$`Complaint Type`,service_data$Borough, service_data$week_number),
+  FUN = length
+) %>% 
+  filter(Group.3 == 40) %>% 
+  group_by(Group.2) %>% summarise(max_x = max(x),.groups = 'drop') %>% 
+  arrange(desc(max_x)) %>% 
+  rename(Borough = Group.2, Tickets = max_x)
+
+aggregate(
+  service_data$`Complaint Type`,
+  by = list(service_data$`Complaint Type`,service_data$Borough, service_data$week_number),
+  FUN = length
+) %>% 
+  filter(Group.3 == 40) %>% 
+  arrange(desc(x)) %>% 
+  rename(Issue = Group.1,week_number = Group.3,Borough = Group.2, Tickets = x) %>% 
+  inner_join(week_40_highest,by=c("Borough" = "Borough","Tickets" = "Tickets"))
 ```
 

@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -138,7 +172,14 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#q5.-types-of-complaints-that-get-closed-the-fastestslowest-by-using-the-mean-resolution-time-to-close-a-request." id="toc-q5.-types-of-complaints-that-get-closed-the-fastestslowest-by-using-the-mean-resolution-time-to-close-a-request." class="nav-link active" data-scroll-target="#q5.-types-of-complaints-that-get-closed-the-fastestslowest-by-using-the-mean-resolution-time-to-close-a-request."><span class="header-section-number">3.1</span> Q5. Types of complaints that get closed the fastest/slowest, by using the mean resolution time to close a request.</a></li>
+  <li><a href="#q6.-what-are-the-trends-in-service-requests-over-time" id="toc-q6.-what-are-the-trends-in-service-requests-over-time" class="nav-link" data-scroll-target="#q6.-what-are-the-trends-in-service-requests-over-time"><span class="header-section-number">3.2</span> Q6. What are the trends in service requests over time?</a></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/EDAV-Project4/311-Service-Requests/edit/main/results.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/EDAV-Project4/311-Service-Requests/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -160,8 +201,224 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">warn =</span> <span class="sc">-</span><span class="dv">1</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(nycgeo)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggridges)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vcd)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse,<span class="at">warn.conflicts =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>service_data <span class="ot">=</span> <span class="fu">read_csv</span>(<span class="st">"C:</span><span class="sc">\\</span><span class="st">Users</span><span class="sc">\\</span><span class="st">varun</span><span class="sc">\\</span><span class="st">Downloads</span><span class="sc">\\</span><span class="st">311_Service_Requests_from_20230901_to_20231129.csv"</span>,<span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>service_data <span class="ot">&lt;-</span> service_data[,<span class="sc">!</span>(</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">colnames</span>(service_data) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Vehicle Type"</span>, <span class="st">"Due Date"</span>, <span class="st">"Facility Type"</span>, <span class="st">"Landmark"</span>, <span class="st">"City"</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>)] <span class="sc">%&gt;%</span> </span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Borough<span class="sc">!=</span><span class="st">"Unspecified"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>service_data<span class="sc">$</span><span class="st">`</span><span class="at">Closed Date</span><span class="st">`</span> <span class="ot">&lt;-</span> <span class="fu">date</span>(<span class="fu">mdy_hms</span>(service_data<span class="sc">$</span><span class="st">`</span><span class="at">Closed Date</span><span class="st">`</span>,<span class="at">tz=</span><span class="fu">Sys.timezone</span>()))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>service_data<span class="sc">$</span><span class="st">`</span><span class="at">Created Date</span><span class="st">`</span> <span class="ot">&lt;-</span> <span class="fu">date</span>(<span class="fu">mdy_hms</span>(service_data<span class="sc">$</span><span class="st">`</span><span class="at">Created Date</span><span class="st">`</span>,<span class="at">tz=</span><span class="fu">Sys.timezone</span>()))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>service_data<span class="sc">$</span>Closing_Duration <span class="ot">&lt;-</span> service_data<span class="sc">$</span><span class="st">`</span><span class="at">Closed Date</span><span class="st">`</span> <span class="sc">-</span> service_data<span class="sc">$</span><span class="st">`</span><span class="at">Created Date</span><span class="st">`</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<section id="q5.-types-of-complaints-that-get-closed-the-fastestslowest-by-using-the-mean-resolution-time-to-close-a-request." class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="q5.-types-of-complaints-that-get-closed-the-fastestslowest-by-using-the-mean-resolution-time-to-close-a-request."><span class="header-section-number">3.1</span> Q5. Types of complaints that get closed the fastest/slowest, by using the mean resolution time to close a request.</h2>
+<p><strong>Complaints that get resolved the fastest</strong></p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>complaint_duration <span class="ot">&lt;-</span> service_data <span class="sc">%&gt;%</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="st">`</span><span class="at">Complaint Type</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(Closing_Duration,mean, <span class="at">na.rm=</span><span class="cn">TRUE</span>))</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>complaint_duration[<span class="fu">order</span>(complaint_duration<span class="sc">$</span>Closing_Duration, <span class="at">decreasing =</span> <span class="cn">FALSE</span>),] <span class="sc">%&gt;%</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">40</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Closing_Duration, <span class="at">y =</span> <span class="fu">fct_rev</span>(</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fct_reorder</span>(<span class="st">`</span><span class="at">Complaint Type</span><span class="st">`</span>, Closing_Duration, <span class="at">.desc =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  ))) <span class="sc">+</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Closing Duration (Days)"</span>) <span class="sc">+</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Complaint Type"</span>) <span class="sc">+</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Mean Time for Complaint Resolution"</span>)<span class="sc">+</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="results_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p><strong>Top 40 Complaints that get resolved the slowest</strong></p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>complaint_duration[<span class="fu">order</span>(complaint_duration<span class="sc">$</span>Closing_Duration, <span class="at">decreasing =</span> <span class="cn">TRUE</span>),] <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">40</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Closing_Duration, <span class="at">y =</span> <span class="fu">fct_rev</span>(</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fct_reorder</span>(<span class="st">`</span><span class="at">Complaint Type</span><span class="st">`</span>, Closing_Duration, <span class="at">.desc =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  ))) <span class="sc">+</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Closing Duration"</span>) <span class="sc">+</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Complaint Type"</span>) <span class="sc">+</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Mean Time for Complaint Resolution (Days)"</span>)<span class="sc">+</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="results_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p><strong>Comments:</strong></p>
+<p><strong>Resolution time for tickets across Boroughs</strong></p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>service_data <span class="sc">%&gt;%</span> <span class="fu">na.omit</span>(service_data) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Borough ,<span class="at">y =</span> Closing_Duration)) <span class="sc">+</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Boxplot for Ticket Closing Duration for each Borough"</span>)<span class="sc">+</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Borough"</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Ticket Resolution Duration (Days)"</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="results_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p><strong>Comments:</strong></p>
+<p>From the boxplots we can see that the median resolution time across different boroughs is nearly the same (Between 1-2 days). The outliers are mainly due to issues visualized in the previous Cleveland plot. A ridgeline plot was considered earlier to visualize instead of the boxplot but since most of the resolution times are close to 1-2 days, there was not a lot of information that could be derived from such a distribution.</p>
+<p><strong>Resolution time for tickets across Districts</strong></p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>service_district <span class="ot">&lt;-</span> service_data <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="st">`</span><span class="at">City Council Districts</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mn_cd =</span> <span class="fu">mean</span>(Closing_Duration, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(mn_cd)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">value =</span> mn_cd) <span class="sc">%&gt;%</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>(value) <span class="sc">%&gt;%</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">City Council Districts</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">as.character</span>(<span class="st">`</span><span class="at">City Council Districts</span><span class="st">`</span>))</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="fu">nyc_boundaries</span>(<span class="at">geography =</span> <span class="st">"council"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(service_district,</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"council_dist_id"</span> <span class="ot">=</span> <span class="st">"City Council Districts"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">fill =</span> value)) <span class="sc">+</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_c</span>(<span class="at">name =</span> <span class="st">"Mean Resolution Time (Days)"</span>,</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>                       <span class="at">option =</span> <span class="st">"inferno"</span>,</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>                       <span class="at">direction =</span> <span class="sc">-</span><span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"How fast is the ticket resolution for each District?"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="results_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="q6.-what-are-the-trends-in-service-requests-over-time" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="q6.-what-are-the-trends-in-service-requests-over-time"><span class="header-section-number">3.2</span> Q6. What are the trends in service requests over time?</h2>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>service_data<span class="sc">$</span>week_number <span class="ot">&lt;-</span> <span class="fu">week</span>(<span class="fu">ymd</span>(service_data<span class="sc">$</span><span class="st">`</span><span class="at">Created Date</span><span class="st">`</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p><strong>Density Histogram to understand the distribution of ticket creation over each week</strong></p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(service_data, <span class="fu">aes</span>(<span class="at">x =</span> week_number)) <span class="sc">+</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">after_stat</span>(density)),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"black"</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"#CC5500"</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">binwidth =</span> <span class="dv">1</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">right =</span> <span class="cn">FALSE</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Density Histogram for 311 Tickets created every week (Sept-Nov)"</span>) <span class="sc">+</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="results_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p><strong>Line plot for easy comparison of ticket creation every week across different Boroughs</strong></p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>custom_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"QUEENS"</span> <span class="ot">=</span> <span class="st">"yellow"</span>,<span class="st">"MANHATTAN"</span><span class="ot">=</span><span class="st">"blue"</span>,<span class="st">"BRONX"</span><span class="ot">=</span><span class="st">"brown"</span>,<span class="st">"STATEN ISLAND"</span> <span class="ot">=</span> <span class="st">"green"</span>, <span class="st">"BROOKLYN"</span> <span class="ot">=</span> <span class="st">"red"</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">aggregate</span>(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  service_data<span class="sc">$</span><span class="st">`</span><span class="at">Complaint Type</span><span class="st">`</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> <span class="fu">list</span>(service_data<span class="sc">$</span>Borough, service_data<span class="sc">$</span>week_number),</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">FUN =</span> length</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">issue_count =</span> x,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">week_number =</span> Group<span class="fl">.2</span>,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">Borough =</span> Group<span class="fl">.1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> week_number, <span class="at">y =</span> issue_count, <span class="at">color =</span> Borough)) <span class="sc">+</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> custom_colors) <span class="sc">+</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Tickets created in different Boroughs for each week (Sept-Nov)"</span>) <span class="sc">+</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Week Number"</span>, <span class="at">y =</span> <span class="st">"Created Tickets count"</span>) <span class="sc">+</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="results_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p><strong>Comments:</strong></p>
+<p>There definitely is a pattern as week 40 has the highest ticket creation count across all the Boroughs.</p>
+<p>Week 35 and Week 48 have the lowest ticket counts as the dataset from Sept 01 till the Nov29. Sept 01 is a Friday and so week 35 just has ticket counts for Friday and Saturday instead of the entire week. Similary, the entire week data for week 48 was not used.</p>
+<p><strong>We now analyze week 40 to understand the type of issue causing the peak</strong></p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>week_40_highest <span class="ot">&lt;-</span> <span class="fu">aggregate</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  service_data<span class="sc">$</span><span class="st">`</span><span class="at">Complaint Type</span><span class="st">`</span>,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> <span class="fu">list</span>(service_data<span class="sc">$</span><span class="st">`</span><span class="at">Complaint Type</span><span class="st">`</span>,service_data<span class="sc">$</span>Borough, service_data<span class="sc">$</span>week_number),</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">FUN =</span> length</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Group<span class="fl">.3</span> <span class="sc">==</span> <span class="dv">40</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Group<span class="fl">.2</span>) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="at">max_x =</span> <span class="fu">max</span>(x),<span class="at">.groups =</span> <span class="st">'drop'</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(max_x)) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Borough =</span> Group<span class="fl">.2</span>, <span class="at">Tickets =</span> max_x)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="fu">aggregate</span>(</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  service_data<span class="sc">$</span><span class="st">`</span><span class="at">Complaint Type</span><span class="st">`</span>,</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> <span class="fu">list</span>(service_data<span class="sc">$</span><span class="st">`</span><span class="at">Complaint Type</span><span class="st">`</span>,service_data<span class="sc">$</span>Borough, service_data<span class="sc">$</span>week_number),</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">FUN =</span> length</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Group<span class="fl">.3</span> <span class="sc">==</span> <span class="dv">40</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(x)) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Issue =</span> Group<span class="fl">.1</span>,<span class="at">week_number =</span> Group<span class="fl">.3</span>,<span class="at">Borough =</span> Group<span class="fl">.2</span>, <span class="at">Tickets =</span> x) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(week_40_highest,<span class="at">by=</span><span class="fu">c</span>(<span class="st">"Borough"</span> <span class="ot">=</span> <span class="st">"Borough"</span>,<span class="st">"Tickets"</span> <span class="ot">=</span> <span class="st">"Tickets"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>            Issue       Borough week_number Tickets
+1 Illegal Parking      BROOKLYN          40    3629
+2 Illegal Parking        QUEENS          40    2795
+3 Illegal Parking     MANHATTAN          40    1454
+4 Illegal Parking         BRONX          40    1445
+5 Illegal Parking STATEN ISLAND          40     296</code></pre>
+</div>
+</div>
+<p><strong>Comment</strong>:</p>
+<p>Although there are many issues contributing to the peak on Week 40, Illegal Parking contributes the most</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -417,7 +674,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/EDAV-Project4/311-Service-Requests/edit/main/results.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/EDAV-Project4/311-Service-Requests/issues/new" class="toc-action">Report an issue</a></p></div></div></div>
+    </div>
     <div class="nav-footer-right">This book was built with <a href="https://quarto.org/">Quarto</a>.</div>
   </div>
 </footer>

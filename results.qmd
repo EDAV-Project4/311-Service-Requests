@@ -1,1 +1,186 @@
 # Results
+
+```{r message=FALSE, warning=FALSE}
+options(warn = -1)
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+library(nycgeo)
+library(ggridges)
+library(vcd)
+library(sf)
+library(tidyverse,warn.conflicts = FALSE)
+```
+
+```{r}
+service_data = read_csv("C:\\Users\\varun\\Downloads\\311_Service_Requests_from_20230901_to_20231129.csv",show_col_types = FALSE)
+
+service_data <- service_data[,!(
+  colnames(service_data) %in% c("Vehicle Type", "Due Date", "Facility Type", "Landmark", "City")
+)] %>% 
+  filter(Borough!="Unspecified")
+```
+
+```{r}
+service_data$`Closed Date` <- date(mdy_hms(service_data$`Closed Date`,tz=Sys.timezone()))
+service_data$`Created Date` <- date(mdy_hms(service_data$`Created Date`,tz=Sys.timezone()))
+service_data$Closing_Duration <- service_data$`Closed Date` - service_data$`Created Date`
+```
+
+
+## Q5. Types of complaints that get closed the fastest/slowest, by using the mean resolution time to close a request.
+
+
+**Complaints that get resolved the fastest**
+```{r message=FALSE, warning=FALSE}
+complaint_duration <- service_data %>%
+  group_by(`Complaint Type`) %>%
+  summarise(across(Closing_Duration,mean, na.rm=TRUE))
+
+complaint_duration[order(complaint_duration$Closing_Duration, decreasing = FALSE),] %>%
+  slice(1:40) %>%
+  ggplot(aes(x = Closing_Duration, y = fct_rev(
+    fct_reorder(`Complaint Type`, Closing_Duration, .desc = TRUE)
+  ))) +
+  geom_point() +
+  xlab("Closing Duration (Days)") +
+  ylab("Complaint Type") +
+  ggtitle("Mean Time for Complaint Resolution")+
+  theme_bw()
+
+```
+
+**Top 40 Complaints that get resolved the slowest**
+```{r message=FALSE, warning=FALSE}
+complaint_duration[order(complaint_duration$Closing_Duration, decreasing = TRUE),] %>%
+  slice(1:40) %>%
+  ggplot(aes(x = Closing_Duration, y = fct_rev(
+    fct_reorder(`Complaint Type`, Closing_Duration, .desc = TRUE)
+  ))) +
+  geom_point() +
+  xlab("Closing Duration") +
+  ylab("Complaint Type") +
+  ggtitle("Mean Time for Complaint Resolution (Days)")+
+  theme_bw()
+
+```
+
+**Comments:**
+
+
+**Resolution time for tickets across Boroughs**
+```{r message=FALSE, warning=FALSE}
+service_data %>% na.omit(service_data) %>% 
+ggplot(aes(x = Borough ,y = Closing_Duration)) +
+  geom_boxplot() +
+  ggtitle("Boxplot for Ticket Closing Duration for each Borough")+
+  labs(
+    x = "Borough",
+    y = "Ticket Resolution Duration (Days)"
+  ) +
+  theme_bw()
+```
+
+**Comments:**
+
+From the boxplots we can see that the median resolution time across different boroughs is nearly the same (Between 1-2 days). The outliers are mainly due to issues visualized in the previous Cleveland plot. A ridgeline plot was considered earlier to visualize instead of the boxplot but since most of the resolution times are close to 1-2 days, there was not a lot of information that could be derived from such a distribution.
+
+
+**Resolution time for tickets across Districts**
+```{r message=FALSE, warning=FALSE}
+service_district <- service_data %>%
+  group_by(`City Council Districts`) %>%
+  summarise(mn_cd = mean(Closing_Duration, na.rm = TRUE)) %>%
+  arrange(desc(mn_cd)) %>%
+  rename(value = mn_cd) %>%
+  drop_na(value) %>%
+  mutate(`City Council Districts` = as.character(`City Council Districts`))
+
+nyc_boundaries(geography = "council") %>%
+  left_join(service_district,
+            by = c("council_dist_id" = "City Council Districts")) %>%
+  ggplot() +
+  geom_sf(aes(fill = value)) +
+  scale_fill_viridis_c(name = "Mean Resolution Time (Days)",
+                       option = "inferno",
+                       direction = -1) +
+  theme_void() +
+  labs(title = "How fast is the ticket resolution for each District?")
+```
+
+
+## Q6. What are the trends in service requests over time?
+
+```{r}
+service_data$week_number <- week(ymd(service_data$`Created Date`))
+```
+
+**Density Histogram to understand the distribution of ticket creation over each week**
+```{r message=FALSE, warning=FALSE}
+ggplot(service_data, aes(x = week_number)) +
+  geom_histogram(
+    aes(y = after_stat(density)),
+    color = "black",
+    fill = "#CC5500",
+    binwidth = 1,
+    right = FALSE
+  ) +
+  ggtitle("Density Histogram for 311 Tickets created every week (Sept-Nov)") +
+  theme_bw()
+```
+
+
+**Line plot for easy comparison of ticket creation every week across different Boroughs**
+
+```{r}
+
+custom_colors <- c("QUEENS" = "yellow","MANHATTAN"="blue","BRONX"="brown","STATEN ISLAND" = "green", "BROOKLYN" = "red")
+aggregate(
+  service_data$`Complaint Type`,
+  by = list(service_data$Borough, service_data$week_number),
+  FUN = length
+) %>%
+  rename(issue_count = x,
+         week_number = Group.2,
+         Borough = Group.1) %>%
+  ggplot(aes(x = week_number, y = issue_count, color = Borough)) +
+  geom_line() +
+  scale_color_manual(values = custom_colors) +
+  ggtitle("Tickets created in different Boroughs for each week (Sept-Nov)") +
+  labs(x = "Week Number", y = "Created Tickets count") +
+  theme_bw()
+```
+
+**Comments:**
+
+There definitely is a pattern as week 40 has the highest ticket creation count across all the Boroughs. 
+
+Week 35 and Week 48 have the lowest ticket counts as the dataset from Sept 01 till the Nov29. Sept 01 is a Friday and so week 35 just has ticket counts for Friday and Saturday instead of the entire week. Similary, the entire week data for week 48 was not used.
+
+**We now analyze week 40 to understand the type of issue causing the peak**
+
+```{r message=FALSE, warning=FALSE}
+week_40_highest <- aggregate(
+  service_data$`Complaint Type`,
+  by = list(service_data$`Complaint Type`,service_data$Borough, service_data$week_number),
+  FUN = length
+) %>% 
+  filter(Group.3 == 40) %>% 
+  group_by(Group.2) %>% summarise(max_x = max(x),.groups = 'drop') %>% 
+  arrange(desc(max_x)) %>% 
+  rename(Borough = Group.2, Tickets = max_x)
+
+aggregate(
+  service_data$`Complaint Type`,
+  by = list(service_data$`Complaint Type`,service_data$Borough, service_data$week_number),
+  FUN = length
+) %>% 
+  filter(Group.3 == 40) %>% 
+  arrange(desc(x)) %>% 
+  rename(Issue = Group.1,week_number = Group.3,Borough = Group.2, Tickets = x) %>% 
+  inner_join(week_40_highest,by=c("Borough" = "Borough","Tickets" = "Tickets"))
+```
+
+**Comment**:
+
+Although there are many issues contributing to the peak on Week 40, Illegal Parking contributes the most
