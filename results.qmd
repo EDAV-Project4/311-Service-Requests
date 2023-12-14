@@ -17,9 +17,9 @@ library(tidyverse,warn.conflicts = FALSE)
 ```
 
 ```{r}
-# service_data = read_csv("C:\\Users\\varun\\Downloads\\311_Service_Requests_from_20230901_to_20231129.csv",show_col_types = FALSE)
+service_data = read_csv("C:\\Users\\varun\\Downloads\\311_Service_Requests_from_20230901_to_20231129.csv",show_col_types = FALSE)
 
-service_data = read_csv('I:/My Drive/MSDS/Study/Fall23/EDAV/Homework/final_project/311_Service_Requests_from_20230901_to_20231129.csv', show_col_types = FALSE)
+#service_data = read_csv('I:/My Drive/MSDS/Study/Fall23/EDAV/Homework/final_project/311_Service_Requests_from_20230901_to_20231129.csv', show_col_types = FALSE)
 
 ```
 
