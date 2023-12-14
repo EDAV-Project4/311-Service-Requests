@@ -80,7 +80,7 @@ library(DataExplorer)
 # library("googledrive")
 
 #load data
-df <- read_csv('I:/My Drive/MSDS/Study/Fall23/EDAV/Homework/final_project/311_Service_Requests_from_20230901_to_20231129.csv')
+df <- read_csv("C:\\Users\\varun\\Downloads\\311_Service_Requests_from_20230901_to_20231129.csv",show_col_types = FALSE)
 # df <- drive_read_string("https://drive.google.com/file/d/1UsYevTBsztmkhGO45Fubz1ToqzoeNHcV/view?usp=drive_link", type = 'csv') #always needs authentication, may not be ideal.
 
 # plot % of missing values for columns 
