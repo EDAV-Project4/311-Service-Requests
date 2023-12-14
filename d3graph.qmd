@@ -6,8 +6,16 @@
   }
 </style> 
 
-<div id="plot">
-</div>
+<div id="plot"></div>
+<p></p>
+
+<p id="color" style="background-color: white; color: black;">
+   Please select a Borough:</p>
+<input type="radio" name="Borough" value="MANHATTAN">MANHATTAN</input>
+<input type="radio" name="Borough" value="QUEENS">QUEENS</input>
+<input type="radio" name="Borough" value="BRONX">BRONX</input>
+<input type="radio" name="Borough" value="BROOKLYN">BROOKLYN</input>
+<input type="radio" name="Borough" value="STATEN ISLAND">STATEN ISLAND</input>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="scripts/myscript.js"></script>
