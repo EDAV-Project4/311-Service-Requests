@@ -9,3 +9,132 @@
 # Conclusion
 
 ## template section
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+```
+
+
+```{r}
+service_data = read_csv("C:\\Users\\varun\\Downloads\\311_Service_Requests_from_20230901_to_20231129.csv")
+
+service_data <- service_data[, !(colnames(service_data) %in% c("Vehicle Type", "Due Date", "Facility Type", "Landmark", "City"))]
+```
+
+
+```{r}
+library(vcd)
+library(ggplot2)
+library(grid)
+
+counts2 <- service_data |>
+  group_by(Agency, Status) |>
+  summarize(Freq = count())
+```
+
+
+```{r}
+library(lubridate)
+
+service_data$`Closed Date` <- date(mdy_hms(service_data$`Closed Date`,tz=Sys.timezone()))
+service_data$`Created Date` <- date(mdy_hms(service_data$`Created Date`,tz=Sys.timezone()))
+service_data$Closing_Duration <- service_data$`Closed Date` - service_data$`Created Date`
+```
+
+```{r}
+complaint_duration <- service_data %>%
+  group_by(`Complaint Type`) %>%
+  summarise(across(Closing_Duration,mean, na.rm=TRUE))
+```
+
+```{r}
+complaint_duration[order(complaint_duration$Closing_Duration, decreasing = TRUE), ]
+
+```
+```{r}
+complaint_duration[order(complaint_duration$Closing_Duration, decreasing = FALSE), ] %>% 
+  slice(1:40) %>% 
+  ggplot(aes(x = Closing_Duration, y = fct_rev(fct_reorder(`Complaint Type`,Closing_Duration,.desc = FALSE))))+
+  geom_point()+
+  xlab("Closing Duration") +
+  ylab("Complaint Type") +
+  ggtitle("Mean Time for Complaint Resolution")
+  theme_bw()
+
+```
+
+```{r}
+ 
+library(ggridges)
+ggplot(service_data, aes(x = Closing_Duration,y = `Complaint Type`)) +
+  geom_density_ridges() 
+```
+
+```{r}
+
+```
+
+```{r}
+library(sf)
+library(nycgeo)
+
+service_borough <- service_data %>% 
+  filter(Borough!="Undefined") %>%
+	group_by(Borough) %>%
+	summarise(mn_cd = mean(Closing_Duration,na.rm = TRUE)) %>% 
+  arrange(desc(mn_cd)) %>%
+  rename(
+    value = mn_cd
+  ) %>% 
+  drop_na(value)
+
+service_borough$b_id[service_borough$Borough == 'MANHATTAN'] <- "1"
+service_borough$b_id[service_borough$Borough == 'BRONX'] <- "2"
+service_borough$b_id[service_borough$Borough == 'BROOKLYN'] <- "3"
+service_borough$b_id[service_borough$Borough == 'QUEENS'] <- "4"
+service_borough$b_id[service_borough$Borough == 'STATEN ISLAND'] <- "5"
+
+nyc_boundaries(geography = "nta") %>% 
+  left_join(service_borough, by = c("borough_id" = "b_id")) %>% 
+  ggplot() +
+  geom_sf(aes(fill = value)) +
+  scale_fill_viridis_c(name = "Mean Resolution Time (Days)", option = "inferno",direction=-1) +
+  theme_void() +
+  labs(title = "How fast is the ticket resolution for each Borough?")
+
+```
+```{r}
+service_district <- service_data %>% 
+	group_by(`City Council Districts`) %>%
+	summarise(mn_cd = mean(Closing_Duration,na.rm = TRUE)) %>% 
+  arrange(desc(mn_cd)) %>%
+  rename(
+    value = mn_cd
+  ) %>% 
+  drop_na(value) %>% 
+  mutate(`City Council Districts` = as.character(`City Council Districts`))
+
+#service_district$b_id[service_district$Borough == 'MANHATTAN'] <- "1"
+#service_district$b_id[service_district$Borough == 'BRONX'] <- "2"
+#service_district$b_id[service_district$Borough == 'BROOKLYN'] <- "3"
+#service_district$b_id[service_district$Borough == 'QUEENS'] <- "4"
+#service_district$b_id[service_district$Borough == 'STATEN ISLAND'] <- "5"
+
+nyc_boundaries(geography = "council") %>% 
+  left_join(service_district, by = c("council_dist_id" = "City Council Districts")) %>% 
+  ggplot() +
+  geom_sf(aes(fill = value)) +
+  scale_fill_viridis_c(name = "Mean Resolution Time (Days)", option = "inferno",direction=-1) +
+  theme_void() +
+  labs(title = "How fast is the ticket resolution for each District?")
+
+```
+
+
+
+```{r}
+
+```
+
