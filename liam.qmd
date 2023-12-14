@@ -23,9 +23,262 @@ Community Boards (each taking charge of 1 Community District, or CD), handle the
 
 Since we're only looking at the New York City dataset, the City column is redundant, and can be removed too.
 
+There are some rows with Borough and Status values being "Unspecified". But they take up such a small % of the total number of rows (~0% from missing value analysis), so we will remove these rows too.
+
 ```{r message = FALSE}
 df <- df[, !(colnames(df) %in% c("Vehicle Type", "Due Date", "Facility Type", "Landmark", "City"))]
+
+# see count of number of values. in Borough, Status column
+table(df[["Borough"]])
+table(df[["Status"]])
+
+# remove rows with Borough / Status = "Unspecified"
+df <- df[!grepl("Unspecified", df$Borough),]
+df <- df[!grepl("Unspecified", df$Status),]
 ```
+
+## 1.  Which borough has the most complaints, and the least?
+```{r message = FALSE}
+library(ggplot2)
+library(forcats)
+library(dplyr)
+
+# specify colors for boroughs
+custom_colors <- c("QUEENS" = "yellow", "MANHATTAN" = "blue", "BRONX" = "brown", "STATEN ISLAND" = "green", "BROOKLYN" = "red")
+
+# plot bar chart
+ggplot(df %>%
+         group_by(Borough) %>% # to include another dimension (but it tends to be too cluttered), add eg: , `Complaint Type`
+         summarise(Total_Complaints = n()), 
+       aes(x = reorder(Borough, -Total_Complaints), y = Total_Complaints/1000, fill = Borough)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Total Complaints by NYC Borough",
+       x = "Borough",
+       y = "Number of Complaints (000s)") +
+  scale_fill_manual(values = custom_colors) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme_minimal() # facetgrid: + facet_grid(Borough ~ `Complaint Type`)
+```
+Brooklyn appears to receive the most 311 complaints, followed by Queens, Manhattan, the Bronx. Staten Island seems to receive the least complaints.
+
+If we zoom into each Borough, and see which areas within them receive more complaints (see q5)...
+
+## 2.  Which complaint types are the most numerous, and the least?
+```{r message = FALSE, fig.height=20, fig.width=10}
+ggplot(df %>%
+         mutate(`Complaint Type` = tolower(`Complaint Type`)) %>%
+         group_by(`Complaint Type`) %>%
+         summarise(Total_Complaints = n()), 
+       aes(x = Total_Complaints/1000, y = reorder(`Complaint Type`, Total_Complaints), fill = `Complaint Type`)) +
+  geom_col(position = position_dodge(width = 20)) +
+  labs(title = "Total Complaints by Complaint Type",
+       x = "Number of Complaints (000s)",
+       y = "Complaint Type") +
+  scale_fill_manual(values = custom_colors) +
+  theme(axis.text.y = element_text(vjust = 0.5))  # Adjust hjust and vjust as needed +
+  theme_minimal()
+```
+On an aggregate level across all boroughs, the most common complaints range from illegal parking, noise in residential spaces, (presumably, the lack of) hot water, to also blocked driveways. In general, noise/cleanliness/water issues are the most frequent complaints, as seen from the top 10-20 bars. 
+
+Towards the bottom of the bar plot, we see that certain issues amount to fewer cases of complaints. These include highway/snow/oil spill issues. This is understandable, given that they are less "day-to-day" issues.
+
+To drill in further, we can facet by boroughs. However, there are clearly too many complaint types. Focusing on just the top 5, for each borough...
+
+```{r message = FALSE, fig.height=6, fig.width=8}
+library(tidytext)
+
+df_top <- df %>%
+  mutate(`Complaint Type` = tolower(`Complaint Type`)) %>%
+  group_by(Borough, `Complaint Type`) %>%
+  summarise(Total_Complaints = n()) %>%
+  group_by(Borough) %>%
+  top_n(5, wt = Total_Complaints) %>%
+  arrange(Borough, desc(Total_Complaints)) %>%
+  mutate(`Complaint Type` = factor(`Complaint Type`, levels = unique(`Complaint Type`)))
+
+# Get a vector of unique Boroughs ordered by the total complaints
+ordered_boroughs <- df_top %>%
+  arrange(Borough) %>%
+  group_by(Borough) %>%
+  summarise(total_complaints = sum(Total_Complaints)) %>%
+  arrange(desc(total_complaints)) %>%
+  pull(Borough)
+
+# Use reorder_within to sort bars within each facet
+ggplot(df_top, aes(x = Total_Complaints, y = reorder_within(`Complaint Type`, Total_Complaints, Borough), fill = `Complaint Type`)) +
+  geom_col() +
+  labs(title = "Top 5 Complaint Types by Borough",
+       x = "Number of Complaints",
+       y = "Complaint Type") +
+  scale_fill_manual(values = custom_colors) +
+  theme_minimal() +
+  facet_wrap(~Borough, scales = "free_y", ncol = 1, strip.position = "bottom") +
+  theme(axis.text.y = element_text(vjust = 0.5)) +
+  theme_minimal()
+```
+
+## 3.  What are the locations that most complaints are associated with?
+
+We explore locations by their Street Names (eg. Seventh Avenue), not Incident Address (eg. 31 Seventh Avenue, 139 Seventh Avenue), as the latter would have too many unique categories. For the initial plots here, we do not use zip code or longitude/latitude as they are less interpretable (we will plot that on a chloropleth later).
+
+Since the number of missing rows in Street Names is low, as seen from the missing vales analysis (~3.7% rows missing), we shall omit it from this section's analysis.
+
+```{r message = FALSE}
+
+# remove rows with missing Street Name
+df_temp <- df[complete.cases(df$`Street Name`), ]
+```
+
+```{r message = FALSE}
+df_top <- df_temp %>%
+  mutate(`Street Name` = tolower(`Street Name`)) %>%
+  group_by(Borough, `Street Name`) %>%
+  summarise(Total_Complaints = n()) %>%
+  group_by(Borough) %>%
+  top_n(5, wt = Total_Complaints) %>%
+  arrange(Borough, desc(Total_Complaints)) %>%
+  mutate(`Complaint Type` = factor(`Street Name`, levels = unique(`Street Name`)))
+
+# Get a vector of unique Boroughs ordered by the total complaints
+ordered_boroughs <- df_top %>%
+  arrange(Borough) %>%
+  group_by(Borough) %>%
+  summarise(total_complaints = sum(Total_Complaints)) %>%
+  arrange(desc(total_complaints)) %>%
+  pull(Borough)
+
+# Use reorder_within to sort bars within each facet
+ggplot(df_top, aes(x = Total_Complaints, y = reorder_within(`Street Name`, Total_Complaints, Borough), fill = `Street Name`)) +
+  geom_col() +
+  labs(title = "Top 5 Complaint Types by Borough",
+       x = "Number of Complaints",
+       y = "Complaint Type") +
+  scale_fill_manual(values = custom_colors) +
+  theme_minimal() +
+  facet_wrap(~Borough, scales = "free_y", ncol = 1, strip.position = "bottom") +
+  theme(axis.text.y = element_text(vjust = 0.5)) +
+  theme_minimal()
+```
+We see from here some of the most complained streets in each borough, eg. Ocean Avenue in Brooklyn. But this can also be high, due to the fact that some of them are long, main roads in each Borough (eg. Broadway, Amsterdam Avenue in Manhattan). We can plot a chloropleth to get a better, geographical view of problem areas.
+
+
+## 4.  What is the proportion of complaints that were handled by different departments?
+```{r message = FALSE}
+ggplot(df %>%
+         group_by(Agency) %>%
+         summarise(Total_Complaints = n()), 
+       aes(x = reorder(Agency, -Total_Complaints), y = Total_Complaints/1000, fill = Agency)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Total Complaints by NYC Agencies",
+       x = "Agency",
+       y = "Number of Complaints (000s)") +
+  scale_fill_manual(values = custom_colors) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme_minimal()
+```
+We see here that the number of complaints managed by the NYPD was the most, followed by the HPD, and then the DSNY. DHS, TLC, EDC, DCWP, and DOE seem to handle the least number of complaints. The various departments and their abbreviations are as follows...
+
+```{r message = FALSE}
+library(knitr)
+
+# Remove duplicates
+df_agencies <- distinct(select(df, Agency, `Agency Name`))
+
+# Display the table
+kable(df_agencies, caption = "Agencies", format = "html")
+```
+
+
+```{r message = FALSE}
+library(ggalluvial)
+library(vcd)
+library(alluvial)
+
+
+ggplot(df, aes(axis1 = Borough, axis2 = Agency, y = ..count.., label = Agency)) +
+  geom_alluvium(aes(fill = Status)) +
+  geom_stratum(aes(fill = Status)) +
+  geom_text(stat = "stratum", aes(label = after_stat(stratum))) +
+  theme_minimal()
+
+df$Status <- factor(df$Status, levels = c("Open", "Assigned", "Pending", "Started", "In Progress", "Closed"))
+
+# too many cols messy
+mosaic(Status ~ Borough + Agency, 
+       labeling = labeling_border(
+         rot_labels=c(0,0,45)
+       ),
+       data = df, 
+       shade = TRUE, 
+       direction = c("v","v","h"),
+       main = "Mosaic Plot of Boroughs, and the \nstatuses of their complaints' from each Agency")
+
+
+alluvial_data <- as.data.frame(table(df$Borough, df$Agency, df$Status))
+
+# Plot the alluvial diagram
+alluvial(alluvial_data, freq = alluvial_data$Freq, 
+         # col = ifelse(alluvial_data$`df$Status` == "Closed", "blue", "red"),
+         # border = ifelse(alluvial_data$`df$Status` == "Closed", "darkblue", "darkred"),
+         cex = 0.7)
+
+ggplot(df, aes(axis1 = Borough, axis2 = Agency, y = after_stat(stratum), label = after_stat(stratum))) +
+  geom_flow(aes(fill = Status)) +
+  geom_stratum(aes(fill = Status)) +
+  # geom_text(stat = "stratum", aes(label = after_stat(stratum)), size = 3) +
+  geom_text(stat = "stratum", aes(label = ifelse(after_stat(stratum) == "Borough", as.character(Borough), "")), size = 3) +
+  scale_x_discrete(limits = c("Borough", "Agency", "Status")) +
+  labs(title = "Alluvial Plot",
+       subtitle = "Flow of Counts from Borough to Agency to Status",
+       x = NULL, y = NULL) +
+  theme_minimal()
+
+```
+
+```{r message = FALSE}
+df_top2 <- df %>%
+  group_by(Borough, `Street Name`, `Complaint Type`, Status) %>%
+  summarise(Count = n()) %>%
+  group_by(Borough, `Street Name`, Status) %>%
+  top_n(2, wt = Count) %>%
+  ungroup()
+
+# Create the alluvial plot
+ggplot(df_top2, aes(axis1 = Borough, axis2 = `Street Name`, y = Count, fill = Status)) +
+  geom_flow(aes(fill = Status)) +
+  geom_stratum() +
+  geom_text(stat = "stratum", aes(label = after_stat(stratum))) +
+  theme_void() +
+  labs(title = "Alluvial Diagram of Complaints Flow",
+       subtitle = "Top 2 Complaint Types per Borough",
+       x = NULL, y = NULL)
+ ```
+
+## 5.  What types of complaints get closed the fastest/slowest, by using the mean resolution time to close a request?
+```{r message = FALSE}
+# Specify the desired order of the x-axis values
+custom_order <- c("Open", "Assigned", "Pending", "Started", "In Progress", "Closed")
+
+ggplot(df %>%
+         group_by(Status) %>%
+         summarise(Total_Complaints = n()), 
+       aes(x = factor(Status, levels = custom_order), y = Total_Complaints/1000, fill = Status)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Total Complaints by Status",
+       x = "Complaint Status",
+       y = "Number of Complaints (000s)") +
+  scale_fill_manual(values = custom_colors) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme_minimal()
+
+```
+The [data dictionary](https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9) provided did not explicitly state what each status means, but a sensible inference would be that they are ordinal categories, going from Open, to being Assigned to some agency. It would presumably stay in a Pending status, before work on it gets Started. It'll remain In Progress, until it gets Closed by the responsible agency. 
+
+## 6.  What are the trends in service requests over time?
+```{r message = FALSE}
+
+```
+
 ## template section
 
 # Interactive component in D3
