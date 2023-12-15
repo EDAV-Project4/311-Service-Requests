@@ -1,6 +1,6 @@
 # Results
 
-```{r setup, include=FALSE} 
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
 ```
 
@@ -23,9 +23,9 @@ service_data = read_csv("C:\\Users\\varun\\Downloads\\311_Service_Requests_from_
 
 ```
 
-
 ## Clean data
-Since "Facility Type", "Vehicle Type", "Due Date" columns are all having >90% missing values (missing value analysis), we will remove them. 
+
+Since "Facility Type", "Vehicle Type", "Due Date" columns are all having \>90% missing values (missing value analysis), we will remove them.
 
 From the dataset description, they refer to...
 
@@ -35,16 +35,15 @@ Vehicle Type: If the incident is a taxi, this field describes the type of TLC ve
 
 Due Date: Date when responding agency is expected to update the SR. This is based on the Complaint Type and internal Service Level Agreements (SLAs).
 
-"Landmark" has >40% missing values. But since other address columns (eg. Longitude, Latitude, Incident Address) are proxies of it, we can remove "Landmark".
+"Landmark" has \>40% missing values. But since other address columns (eg. Longitude, Latitude, Incident Address) are proxies of it, we can remove "Landmark".
 
 Landmark: If the incident location is identified as a Landmark the name of the landmark will display here
 
-Community Boards (each taking charge of 1 Community District, or CD), together with the City Council Districts, handle the "day-to-day processing of citizen complaints and requests for municipal services". At the sub-borough level, we will look at how well each CD manages their municipal issues.
-["link"](https://www.nyc.gov/site/queenscb6/about/frequently-asked-questions-faq.page)
+Community Boards (each taking charge of 1 Community District, or CD), together with the City Council Districts, handle the "day-to-day processing of citizen complaints and requests for municipal services". At the sub-borough level, we will look at how well each CD manages their municipal issues. ["link"](https://www.nyc.gov/site/queenscb6/about/frequently-asked-questions-faq.page)
 
 Since we're only looking at the New York City dataset, the City column is redundant, and can be removed too.
 
-There are some rows with Borough and Status values being "Unspecified". But they take up such a small % of the total number of rows (~0% from missing value analysis), so we will remove these rows too.
+There are some rows with Borough and Status values being "Unspecified". But they take up such a small % of the total number of rows (\~0% from missing value analysis), so we will remove these rows too.
 
 ```{r message = FALSE}
 service_data <- service_data[, !(colnames(service_data) %in% c("Vehicle Type", "Due Date", "Facility Type", "Landmark", "City"))]
@@ -64,6 +63,7 @@ service_data <- service_data %>%
 ```
 
 ## (Q1) Which borough has the most complaints, and the least?
+
 ```{r message = FALSE}
 # library(ggplot2)
 library(forcats)
@@ -85,11 +85,13 @@ ggplot(service_data %>%
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   theme_minimal()
 ```
+
 **Comments:**
 
 Brooklyn appears to receive the most 311 complaints, followed by Queens, Manhattan, the Bronx. Staten Island seems to receive the least complaints.
 
 ## (Q2) Which complaint types are the most numerous, and the least?
+
 ```{r message = FALSE, fig.height=20, fig.width=10}
 ggplot(service_data %>%
          # mutate(`Complaint Type` = tolower(`Complaint Type`)) %>%
@@ -107,7 +109,7 @@ ggplot(service_data %>%
 
 **Comments:**
 
-On an aggregate level across all boroughs, the most common complaints range from illegal parking, noise in residential spaces, (presumably, the lack of) hot water, to also blocked driveways. In general, noise/cleanliness/water issues are the most frequent complaints, as seen from the top 10-20 bars. 
+On an aggregate level across all boroughs, the most common complaints range from illegal parking, noise in residential spaces, (presumably, the lack of) hot water, to also blocked driveways. In general, noise/cleanliness/water issues are the most frequent complaints, as seen from the top 10-20 bars.
 
 Towards the bottom of the bar plot, we see that certain issues amount to fewer cases of complaints. These include highway/snow/oil spill issues. This is understandable, given that they are less "day-to-day" issues.
 
@@ -145,6 +147,7 @@ ggplot(service_data_top, aes(x = Total_Complaints, y = reorder_within(`Complaint
   theme(axis.text.y = element_text(vjust = 0.5)) +
   theme_minimal()
 ```
+
 **Comments:**
 
 We see that again, illegal parking, lack of hot water, and residential noise rank amongst the top 5 complaints across all 5 boroughs. This would certainly be something to look out for, for anyone who's looking to stay in these boroughs. But can we go 1 level lower, to see which streets (in these boroughs) contain many of these complaints?
@@ -153,7 +156,7 @@ We see that again, illegal parking, lack of hot water, and residential noise ran
 
 We explore locations by their Street Names (eg. Seventh Avenue), not Incident Address (eg. 31 Seventh Avenue, 139 Seventh Avenue), as the latter would have too many unique categories. For the initial plots here, we do not use zip code or longitude/latitude as they are less interpretable (we will plot that on a chloropleth later).
 
-Since the number of missing rows in Street Names is low, as seen from the missing vales analysis (~3.7% rows missing), we shall omit these missing rows from this section's analysis.
+Since the number of missing rows in Street Names is low, as seen from the missing vales analysis (\~3.7% rows missing), we shall omit these missing rows from this section's analysis.
 
 ```{r message = FALSE}
 
@@ -191,6 +194,7 @@ ggplot(service_data_top, aes(x = Total_Complaints, y = reorder_within(`Street Na
   theme(axis.text.y = element_text(vjust = 0.5)) +
   theme_minimal()
 ```
+
 **Comments:**
 
 We see from here some of the most complained streets in each borough, eg. Ocean Avenue in Brooklyn. But this can also be high, due to the fact that some of them are long, main roads in each Borough (eg. Broadway, Amsterdam Avenue in Manhattan). We can plot a chloropleth to get a better, geographical view of problem areas:
@@ -216,8 +220,12 @@ service_data_top_districts <- service_data %>%
   labs(title = "Total Complaints for each District")
 ```
 
+**Comment:**
+
+From this, we can see that indeed the Amsterdam and Broadway Ave areas in Manhattan UWS have the most complaints. So is the Prospect Park area in Brooklyn, which also coincides with the Ocean Ave street. This narrows down the areas of the streets, which are more problematic.
 
 ## (Q4) What is the proportion of complaints that were handled by different departments?
+
 ```{r message = FALSE}
 ggplot(service_data %>%
          group_by(Agency) %>%
@@ -242,8 +250,7 @@ service_data_agencies <- distinct(select(service_data, Agency, `Agency Name`))
 kable(service_data_agencies, caption = "Agencies", format = "html")
 ```
 
-
-We wanted to also explore how efficient/overworked each Agency is, in managing these complaints. These could provide an indication as to the level of service a resident might expect, when living in the different parts of NYC. We chose to only factor up to 2 levels, because any more levels, and the mosaic plot would become too cluttered to read, given the huge number of categories that we have. 
+We wanted to also explore how efficient/overworked each Agency is, in managing these complaints. These could provide an indication as to the level of service a resident might expect, when living in the different parts of NYC. We chose to only factor up to 2 levels, because any more levels, and the mosaic plot would become too cluttered to read, given the huge number of categories that we have.
 
 The final plot can be seen below:
 
@@ -259,13 +266,14 @@ contingency_table <- table(service_data_temp$Agency, service_data_temp$Status)
 mosaicplot(contingency_table, main = "Distribution of Complaint Status by NYC Agencies", las=2)
 
 ```
+
 **Comments:**
 
-Note that: 
+Note that:
 
-- The [data dictionary](https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9) provided did not explicitly state what each status means, but a sensible inference would be that they are ordinal categories, going from Open, to being Assigned to some agency. It would presumably stay in a Pending status, before work on it gets Started. It'll remain In Progress, until it gets Closed by the responsible agency. 
+-   The [data dictionary](https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9) provided did not explicitly state what each status means, but a sensible inference would be that they are ordinal categories, going from Open, to being Assigned to some agency. It would presumably stay in a Pending status, before work on it gets Started. It'll remain In Progress, until it gets Closed by the responsible agency.
 
-- Lines that split into 3 bands, indicate 0 values for that Status tier.
+-   Lines that split into 3 bands, indicate 0 values for that Status tier.
 
 We shall focus on the 2 most overworked agencies: NYPD and HPD, with the widest bars.
 
@@ -274,6 +282,7 @@ We can thus observe that the NYPD, even though flooded with the greatest volume 
 The HPD (2nd highest workload) however, has many Open issues remaining. This is cold comfort to residents-to-be, who are seeking responsive solutions to their housing infrastructural problems. 1 consolation is that the HPD has also managed to close a large proportion of its complaints.
 
 **What about the distribution of complaints handled by Agencies, per Borough?**
+
 ```{r message=FALSE, warning=FALSE, fig.height=10, fig.width=10}
 
 contingency_table <- table(service_data_temp$Borough, service_data_temp$Agency)
@@ -285,7 +294,7 @@ mosaicplot(contingency_table, main = "Distribution of Agencies handling complain
 
 **Comments:**
 
-Putting this together with the previous plot, we see that once again, NYPD, then HPD, took up the lion's share of the workload for complaints, across all boroughs. Residents-to-be can feel comforted that issues in their home area that are managed by the NYPD, would mostly be closed. 
+Putting this together with the previous plot, we see that once again, NYPD, then HPD, took up the lion's share of the workload for complaints, across all boroughs. Residents-to-be can feel comforted that issues in their home area that are managed by the NYPD, would mostly be closed.
 
 Queens however, ought to be slightly concerned, about the (relatively) higher proportion of police complaints that they receive.
 
@@ -294,6 +303,7 @@ Across all Boroughs (especially those living in the Bronx), one should also righ
 ## (Q5) Types of complaints that get closed the fastest/slowest, by using the mean resolution time to close a request.
 
 Closing complaints is great. But what about the speed at which they get closed?
+
 ```{r}
 service_data$`Closed Date` <- date(mdy_hms(service_data$`Closed Date`,tz=Sys.timezone()))
 service_data$`Created Date` <- date(mdy_hms(service_data$`Created Date`,tz=Sys.timezone()))
@@ -301,6 +311,7 @@ service_data$Closing_Duration <- service_data$`Closed Date` - service_data$`Crea
 ```
 
 **Complaints that get resolved the fastest**
+
 ```{r message=FALSE, warning=FALSE}
 complaint_duration <- service_data %>%
   group_by(`Complaint Type`) %>%
@@ -319,12 +330,12 @@ complaint_duration[order(complaint_duration$Closing_Duration, decreasing = FALSE
 
 ```
 
-**Comments:**
-We see that non-structural issues such as vehicular/sidewalk noise, drug activity, illegal fireworks/parking, generally get resolved the fastest (<1 day). This is to be expected, since the perpetrators can be fairly easily directed away.
+**Comments:** We see that non-structural issues such as vehicular/sidewalk noise, drug activity, illegal fireworks/parking, generally get resolved the fastest (\<1 day). This is to be expected, since the perpetrators can be fairly easily directed away.
 
 Thankfully, many of these are day-to-day issues that can directly affect the wellbeing of residents, and the fact that they get resolved fast brings comfort to anyone who plans to stay in NYC.
 
 **Top 40 Complaints that get resolved the slowest**
+
 ```{r message=FALSE, warning=FALSE}
 complaint_duration[order(complaint_duration$Closing_Duration, decreasing = TRUE),] %>%
   slice(1:40) %>%
@@ -339,13 +350,12 @@ complaint_duration[order(complaint_duration$Closing_Duration, decreasing = TRUE)
 
 ```
 
-**Comments:**
-Structural issues such as sidewalk/sewer/infrastructure condition, generally get resolved the slowest (>10 days). This is to be expected, since these require more involved efforts. 
+**Comments:** Structural issues such as sidewalk/sewer/infrastructure condition, generally get resolved the slowest (\>10 days). This is to be expected, since these require more involved efforts.
 
 However, one might be more concerned about sewage/building maintenance/taxi complaints, when planning to stay in NYC. These can impact the living conditions and transportation satisfaction of said city-dweller, and one might want to be aware of the less-easily resolved issues plaguing certain areas in NYC. We will see in the D3 graph, how all the graphs that answer these questions here, come together, to help someone decide where might be problematic areas to live in.
 
-
 **Resolution time for complaint tickets across Boroughs**
+
 ```{r message=FALSE, warning=FALSE}
 library(ggridges)
 
@@ -360,6 +370,7 @@ ggplot(aes(x = Borough ,y = Closing_Duration)) +
   theme_bw() +
   coord_flip()
 ```
+
 ```{r message = FALSE, fig.height=10, fig.width=10}
 # ridgeline?
 service_data %>%
@@ -376,12 +387,12 @@ service_data %>%
 
 **Comments:**
 
-From the boxplots we can see that the median resolution time across different boroughs is nearly the same (Between 1-2 days). The outliers are mainly due to issues visualized in the previous Cleveland plot. 
+From the boxplots we can see that the median resolution time across different boroughs is nearly the same (Between 1-2 days). The outliers are mainly due to issues visualized in the previous Cleveland plot.
 
-Ridgeline plots were considered too, instead of the boxplots, and we similarly see a long-tail effect, where most complaints get resolved in <5days, and very few take >10 days to close. But since most of the resolution times are close to 1-2 days, there was not a lot of additional useful information that could be derived from such a distribution.
-
+Ridgeline plots were considered too, instead of the boxplots, and we similarly see a long-tail effect, where most complaints get resolved in \<5days, and very few take \>10 days to close. But since most of the resolution times are close to 1-2 days, there was not a lot of additional useful information that could be derived from such a distribution.
 
 **Resolution time for tickets across Districts**
+
 ```{r message=FALSE, warning=FALSE}
 service_district <- service_data %>%
   group_by(`City Council Districts`) %>%
@@ -402,6 +413,7 @@ nyc_boundaries(geography = "council") %>%
   theme_void() +
   labs(title = "How fast is the ticket resolution for each District?")
 ```
+
 **Comments:**
 
 The above analysis for q5, culminates in this chloropleth map, that shows how long the various districts of NYC's boroughs take to resolve 311 service requests.
@@ -415,6 +427,7 @@ service_data$week_number <- week(ymd(service_data$`Created Date`))
 ```
 
 **Density Histogram to understand the distribution of ticket creation over each week**
+
 ```{r message=FALSE, warning=FALSE}
 ggplot(service_data, aes(x = week_number)) +
   geom_histogram(
@@ -422,15 +435,12 @@ ggplot(service_data, aes(x = week_number)) +
     color = "black",
     fill = "#CC5500",
     binwidth = 1,
-    boundary = 0,
     right = FALSE
   ) +
   ggtitle("Density Histogram for 311 Tickets created every week (Sept-Nov)") +
-  theme_bw() +
-  scale_x_continuous(breaks = seq(min(service_data$week_number), max(service_data$week_number), by = 1))
+  theme_bw()
 
 ```
-
 
 **Line plot for easy comparison of ticket creation every week across different Boroughs**
 
@@ -454,7 +464,7 @@ aggregate(
 
 **Comments:**
 
-There definitely is a pattern as week 40 has the highest ticket creation count across all the Boroughs. 
+There definitely is a pattern as week 40 has the highest ticket creation count across all the Boroughs.
 
 Week 35 and Week 48 (omitted, explained below) have the lowest ticket counts. Why? The dataset is from Sept 01 till the Nov29. Since Sept 01 is a Friday, week 35 has only ticket counts for Friday and Saturday instead of the entire week. Similarly, the entire week data for week 48 (only Sunday till Thursday) was not used.
 
