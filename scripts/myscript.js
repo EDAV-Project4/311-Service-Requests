@@ -1,8 +1,6 @@
-// add your JavaScript/D3 to this file
-
 const w = 900;
 const h = 500;
-const margin = {top: 50, right: 0, bottom: 100,
+const margin = {top: 50, right: 0, bottom: 50,
       left: 300};
 const innerWidth = w - margin.left - margin.right;
 const innerHeight = h - margin.top - margin.bottom;
@@ -34,16 +32,17 @@ d3.selectAll("input[name='Borough']").on("change", function () {
       updateChart();
     });
 
-// General Update Pattern
+
 function updateChart() {
       svg.append("text").text("Title");
-      // Remove existing chart elements
+
       svg.selectAll(".bar").remove();
       svg.selectAll("g").remove();
       svg.selectAll(".chart-title").remove();
+
       // Create scales
       const xScale = d3.scaleBand()
-        .domain(d3.range(5))
+        .domain(["Illegal Parking", "Noise - Residential", "Heat/Hot Water", "Blocked Driveway", "Noise - Street/Sidewalk"])
         .range([100, innerWidth])
         .padding(0.1);
 
@@ -67,18 +66,20 @@ function updateChart() {
         .enter()
         .append("rect")
         .attr("class", "bar")
-        .attr("x", (d, i) => xScale(i))
-        .attr("y", d => yScale(d))
+        .attr("x", (d, i) => xScale(["Illegal Parking", "Noise - Residential", "Heat/Hot Water", "Blocked Driveway", "Noise - Street/Sidewalk"][i]))
+        .attr("y", innerHeight)
         .attr("width", xScale.bandwidth())
-        .attr("height", d => innerHeight - yScale(d))
+        .attr("height", 0) // Set initial height to 0 for transition effect
         .transition()
         .duration(500)
-        .attr("fill", "blue")
+        .attr("y", d => yScale(d))
+        .attr("height", d => innerHeight - yScale(d))
+        .attr("fill", "#CC5500")
 
       svg.append("text")
         .attr("class", "x-label")
         .attr("x", 50+innerWidth / 2)
-        .attr("y", innerHeight + margin.bottom - 40)
+        .attr("y", innerHeight + margin.bottom - 10)
         .style("text-anchor", "middle")
         .text("Issue Types");
 
@@ -88,7 +89,7 @@ function updateChart() {
         .attr("x", -innerHeight / 2)
         .attr("y", 345 - margin.left)
         .style("text-anchor", "middle")
-        .text("Ticket Created between Sept and Nov");
+        .text(" 311 Tickets Created between Sept and Nov");
 
       svg.append("text")
         .attr("class", "chart-title")
@@ -96,5 +97,6 @@ function updateChart() {
         .attr("y", 50)
         .style("text-anchor", "middle")
         .text("311 ticket counts for major issues in " + d3.select("input[name='Borough']:checked").node().value);
+
 
     }
