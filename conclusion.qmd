@@ -2,7 +2,7 @@
 
 ### Key Takeaways
 
-The analysis and visualization of 311 NYC tickets helped in revealing the major problems faced by the residents of New York. Data explorations through various visualization plots helped us gain an insight not only about the different 311 issues across the different but also how efficiently these are dealt by the various agencies and the average time for resolution.
+The analysis and visualization of 311 NYC tickets helped in revealing the major problems faced by the residents of New York. Data explorations through various visualization plots helped us gain an insight not only about the different 311 issues across the different locations but also how efficiently these issues are dealt by the various agencies and the average time for resolution  which may influence the quality of municipal care in different locations.
 
 Here are the key takeaways -
 

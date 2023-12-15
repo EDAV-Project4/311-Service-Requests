@@ -182,9 +182,9 @@ ordered_boroughs <- service_data_top %>%
 # Use reorder_within to sort bars within each facet
 ggplot(service_data_top, aes(x = Total_Complaints, y = reorder_within(`Street Name`, Total_Complaints, Borough), fill = `Street Name`)) +
   geom_col() +
-  labs(title = "Top 5 Complaint Types by Borough",
+  labs(title = "Top 5 Streets with the most complaints",
        x = "Number of Complaints",
-       y = "Complaint Type") +
+       y = "Street Name") +
   scale_fill_manual(values = custom_colors) +
   theme_minimal() +
   facet_wrap(~Borough, scales = "free_y", ncol = 1, strip.position = "bottom") +
@@ -248,6 +248,7 @@ We wanted to also explore how efficient/overworked each Agency is, in managing t
 The final plot can be seen below:
 
 ```{r message=FALSE, warning=FALSE, fig.height=10, fig.width=10}
+library(RColorBrewer)
 status_order <- c("Open", "Assigned", "Pending", "Started", "In Progress", "Closed")
 
 service_data_temp$Status <- factor(service_data_temp$Status, , levels = status_order)
@@ -278,7 +279,7 @@ The HPD (2nd highest workload) however, has many Open issues remaining. This is 
 contingency_table <- table(service_data_temp$Borough, service_data_temp$Agency)
 
 # Create a mosaic plot using base R
-mosaicplot(contingency_table, main = "Distribution of Agencies handling complaints, by NYC Boroughs", las=2)
+mosaicplot(contingency_table, main = "Distribution of Agencies handling complaints, by NYC Boroughs", las=2,highlighting = 2)
 
 ```
 
