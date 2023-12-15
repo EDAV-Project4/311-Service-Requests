@@ -137,7 +137,15 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#key-takeaways" id="toc-key-takeaways" class="nav-link active" data-scroll-target="#key-takeaways"><span class="header-section-number">5.0.1</span> Key Takeaways</a></li>
+  <li><a href="#limitations" id="toc-limitations" class="nav-link" data-scroll-target="#limitations"><span class="header-section-number">5.0.2</span> Limitations</a></li>
+  <li><a href="#future-directions-and-lessons-learned" id="toc-future-directions-and-lessons-learned" class="nav-link" data-scroll-target="#future-directions-and-lessons-learned"><span class="header-section-number">5.0.3</span> Future Directions and Lessons Learned</a></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/EDAV-Project4/311-Service-Requests/edit/main/conclusion.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/EDAV-Project4/311-Service-Requests/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -159,8 +167,28 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
+<section id="key-takeaways" class="level3" data-number="5.0.1">
+<h3 data-number="5.0.1" class="anchored" data-anchor-id="key-takeaways"><span class="header-section-number">5.0.1</span> Key Takeaways</h3>
+<p>The analysis and visualization of 311 NYC tickets helped in revealing the major problems faced by the residents of New York. Data explorations through various visualization plots helped us gain an insight not only about the different 311 issues across the different but also how efficiently these are dealt by the various agencies and the average time for resolution.</p>
+<p>Here are the key takeaways -</p>
+<ul>
+<li>Brooklyn had the highest 311 tickets raised as compared to the other boroughs while Staten Island had the least in the time period between Sept 2023-Nov 2023.</li>
+<li>Illegal Parking complaints along with noise/cleanliness/water issues are the most frequent issues. Hence people looking for apartments to rent must keep these in mind.</li>
+<li>NYPD is the most efficient in resolution of tickets among the various agencies. Even though it receives the highest 311 tickets, it is able to resolve most of them. Hence safety related conce</li>
+<li>North Staten Island, west Brooklyn, southwest Queens, southern Manhattan and Bronx are some areas that resolve 311 issues the slowest on average which is a cause of concern for people planning to rent apartments in these areas.</li>
+</ul>
+<p>From the analysis and plots, a person who wishes to rent an apartment in New York can take an informed decision when choosing apartments across the Boroughs of New York.</p>
+</section>
+<section id="limitations" class="level3" data-number="5.0.2">
+<h3 data-number="5.0.2" class="anchored" data-anchor-id="limitations"><span class="header-section-number">5.0.2</span> Limitations</h3>
+<p>Due to the sheer size of the dataset (34.1M rows for 2010-2023) since it is updated daily and our resource constraints, for our analysis we focused only on a subset of the data (837k rows for Sept 2023-Nov2023). Analyzing a bigger time frame may have yielded better insights and many more interesting patterns.</p>
+</section>
+<section id="future-directions-and-lessons-learned" class="level3" data-number="5.0.3">
+<h3 data-number="5.0.3" class="anchored" data-anchor-id="future-directions-and-lessons-learned"><span class="header-section-number">5.0.3</span> Future Directions and Lessons Learned</h3>
+<p>Through this project, we gained a better understanding of d3 and the plethora of visualization plots available for exploration of data. While our analysis and exploration mainly deals with answering questions pertaining to issues for understand the quality of life across boroughs , we can also extend our analysis to provide specific answers for questions with specific issues. Example - Which street/district in New York has the most lack of heat or hot water complaints. The answers to such questions would particularly be useful for city officials and policy makers who would be able to address these issues much more effectively.</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -413,7 +441,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/EDAV-Project4/311-Service-Requests/edit/main/conclusion.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/EDAV-Project4/311-Service-Requests/issues/new" class="toc-action">Report an issue</a></p></div></div></div>
+    </div>
     <div class="nav-footer-right">This book was built with <a href="https://quarto.org/">Quarto</a>.</div>
   </div>
 </footer>
