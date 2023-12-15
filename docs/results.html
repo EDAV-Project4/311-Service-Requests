@@ -411,9 +411,9 @@ Unspecified
 <span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Use reorder_within to sort bars within each facet</span></span>
 <span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(service_data_top, <span class="fu">aes</span>(<span class="at">x =</span> Total_Complaints, <span class="at">y =</span> <span class="fu">reorder_within</span>(<span class="st">`</span><span class="at">Street Name</span><span class="st">`</span>, Total_Complaints, Borough), <span class="at">fill =</span> <span class="st">`</span><span class="at">Street Name</span><span class="st">`</span>)) <span class="sc">+</span></span>
 <span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
-<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Top 5 Complaint Types by Borough"</span>,</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Top 5 Streets with the most complaints"</span>,</span>
 <span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Number of Complaints"</span>,</span>
-<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Complaint Type"</span>) <span class="sc">+</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Street Name"</span>) <span class="sc">+</span></span>
 <span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> custom_colors) <span class="sc">+</span></span>
 <span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
 <span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Borough, <span class="at">scales =</span> <span class="st">"free_y"</span>, <span class="at">ncol =</span> <span class="dv">1</span>, <span class="at">strip.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
@@ -558,14 +558,15 @@ Unspecified
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>status_order <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Open"</span>, <span class="st">"Assigned"</span>, <span class="st">"Pending"</span>, <span class="st">"Started"</span>, <span class="st">"In Progress"</span>, <span class="st">"Closed"</span>)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>service_data_temp<span class="sc">$</span>Status <span class="ot">&lt;-</span> <span class="fu">factor</span>(service_data_temp<span class="sc">$</span>Status, , <span class="at">levels =</span> status_order)</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>contingency_table <span class="ot">&lt;-</span> <span class="fu">table</span>(service_data_temp<span class="sc">$</span>Agency, service_data_temp<span class="sc">$</span>Status)</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a mosaic plot using base R</span></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="fu">mosaicplot</span>(contingency_table, <span class="at">main =</span> <span class="st">"Distribution of Complaint Status by NYC Agencies"</span>, <span class="at">las=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RColorBrewer)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>status_order <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Open"</span>, <span class="st">"Assigned"</span>, <span class="st">"Pending"</span>, <span class="st">"Started"</span>, <span class="st">"In Progress"</span>, <span class="st">"Closed"</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>service_data_temp<span class="sc">$</span>Status <span class="ot">&lt;-</span> <span class="fu">factor</span>(service_data_temp<span class="sc">$</span>Status, , <span class="at">levels =</span> status_order)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>contingency_table <span class="ot">&lt;-</span> <span class="fu">table</span>(service_data_temp<span class="sc">$</span>Agency, service_data_temp<span class="sc">$</span>Status)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a mosaic plot using base R</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="fu">mosaicplot</span>(contingency_table, <span class="at">main =</span> <span class="st">"Distribution of Complaint Status by NYC Agencies"</span>, <span class="at">las=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <p><img src="results_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="960"></p>
@@ -587,7 +588,7 @@ Unspecified
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>contingency_table <span class="ot">&lt;-</span> <span class="fu">table</span>(service_data_temp<span class="sc">$</span>Borough, service_data_temp<span class="sc">$</span>Agency)</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a mosaic plot using base R</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">mosaicplot</span>(contingency_table, <span class="at">main =</span> <span class="st">"Distribution of Agencies handling complaints, by NYC Boroughs"</span>, <span class="at">las=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">mosaicplot</span>(contingency_table, <span class="at">main =</span> <span class="st">"Distribution of Agencies handling complaints, by NYC Boroughs"</span>, <span class="at">las=</span><span class="dv">2</span>,<span class="at">highlighting =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <p><img src="results_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="960"></p>

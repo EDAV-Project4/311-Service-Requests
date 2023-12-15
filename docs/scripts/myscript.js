@@ -81,7 +81,7 @@ function updateChart() {
         .attr("x", 50+innerWidth / 2)
         .attr("y", innerHeight + margin.bottom - 10)
         .style("text-anchor", "middle")
-        .text("Issue Types");
+        .text("Complaint Types");
 
       svg.append("text")
         .attr("class", "y-label")
