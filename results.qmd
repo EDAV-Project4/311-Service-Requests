@@ -193,7 +193,29 @@ ggplot(service_data_top, aes(x = Total_Complaints, y = reorder_within(`Street Na
 ```
 **Comments:**
 
-We see from here some of the most complained streets in each borough, eg. Ocean Avenue in Brooklyn. But this can also be high, due to the fact that some of them are long, main roads in each Borough (eg. Broadway, Amsterdam Avenue in Manhattan). We can plot a chloropleth to get a better, geographical view of problem areas, which we shall see later.
+We see from here some of the most complained streets in each borough, eg. Ocean Avenue in Brooklyn. But this can also be high, due to the fact that some of them are long, main roads in each Borough (eg. Broadway, Amsterdam Avenue in Manhattan). We can plot a chloropleth to get a better, geographical view of problem areas:
+
+```{r message = FALSE}
+service_data_top_districts <- service_data %>%
+  group_by(`City Council Districts`) %>%
+  summarise(Total_Complaints = n()) %>%
+  arrange(desc(Total_Complaints)) %>%
+  rename(value = Total_Complaints) %>%
+  drop_na(value) %>%
+  mutate(`City Council Districts` = as.character(`City Council Districts`))
+
+  nyc_boundaries(geography = "council") %>%
+  left_join(service_data_top_districts,
+            by = c("council_dist_id" = "City Council Districts")) %>%
+  ggplot() +
+  geom_sf(aes(fill = value)) +
+  scale_fill_viridis_c(name = "Total Complaints",
+                       option = "brewer blues",
+                       direction = -1) +
+  theme_void() +
+  labs(title = "Total Complaints for each District")
+```
+
 
 ## (Q4) What is the proportion of complaints that were handled by different departments?
 ```{r message = FALSE}
@@ -426,7 +448,7 @@ aggregate(
   scale_color_manual(values = custom_colors) +
   ggtitle("Tickets created in different Boroughs for each week (Sept-Nov)") +
   labs(x = "Week Number", y = "Created Tickets count") +
-  theme_grey()
+  theme_bw()
 ```
 
 **Comments:**
